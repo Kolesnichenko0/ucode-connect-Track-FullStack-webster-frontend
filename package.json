@@ -1,0 +1,46 @@
+{
+  "name": "TripUp",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --turbopack -p 5173",
+    "build": "next build",
+    "start": "next start -p 5173",
+    "lint": "next lint",
+    "init-tailwind": "tailwindcss init -p"
+  },
+  "dependencies": {
+    "@googlemaps/js-api-loader": "^1.16.8",
+    "@heroicons/react": "^2.2.0",
+    "@react-google-maps/api": "^2.20.6",
+    "@stripe/react-stripe-js": "^3.6.0",
+    "@stripe/stripe-js": "^7.2.0",
+    "axios": "^1.8.4",
+    "date-fns": "^4.1.0",
+    "disqus-react": "^1.1.6",
+    "framer-motion": "^12.6.5",
+    "lucide-react": "^0.487.0",
+    "mapbox-gl": "^3.11.0",
+    "next": "15.2.4",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-map-gl": "^8.0.2",
+    "react-toastify": "^11.0.5",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3",
+    "@tailwindcss/forms": "^0.5.6",
+    "@tailwindcss/line-clamp": "^0.4.4",
+    "@tailwindcss/typography": "^0.5.10",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "autoprefixer": "^10.4.21",
+    "eslint": "^9",
+    "eslint-config-next": "15.2.4",
+    "postcss": "^8.5.3",
+    "tailwindcss": "^3.3.3",
+    "typescript": "^5"
+  }
+}

@@ -1,0 +1,44 @@
+/* styles/themes.css */
+
+/* Определяем переменные по умолчанию (светлая тема) */
+:root {
+    --bg-primary: #ffffff;
+    --bg-card: #ffffff;
+    --bg-input: #f3f4f6;
+    --text-primary: #1f2937;
+    --text-secondary: #4b5563;
+    --border: #e5e7eb;
+    --accent: #10b981;
+  }
+  
+  /* Определяем переменные для темной темы, которые будут применяться при наличии класса dark */
+  .dark {
+    --bg-primary: #121212;
+    --bg-card: #1e1e1e;
+    --bg-input: #2d3748;
+    --text-primary: #f9fafb;
+    --text-secondary: #9ca3af;
+    --border: #333333;
+    --accent: #34d399;
+  }
+  
+  /* Можно также добавить плавные переходы между темами */
+  body {
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  
+  /* Аналогично для других элементов, которые должны иметь плавный переход */
+  .theme-transition {
+    transition: background-color 0.3s ease, 
+                color 0.3s ease, 
+                border-color 0.3s ease,
+                box-shadow 0.3s ease;
+  }
+  
+  /* Стили для основных элементов приложения */
+  body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+  }
+  
+  /* Другие общие стили для вашего приложения */

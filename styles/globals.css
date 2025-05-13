@@ -1,0 +1,155 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Дополнительные пользовательские стили */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply text-gray-900 dark:text-white bg-gray-50 dark:bg-black dark:bg-black;
+}
+
+/* Стили для кнопок */
+.btn {
+  @apply inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm dark:shadow-none transition-colors duration-200;
+}
+
+.btn-primary {
+  @apply bg-indigo-600 text-white hover:bg-indigo-700;
+}
+
+.btn-secondary {
+  @apply bg-white dark:bg-black text-gray-700 dark:text-gray-200 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-900 dark:bg-black dark:bg-black;
+}
+
+.btn-success {
+  @apply bg-green-600 text-white hover:bg-green-700;
+}
+
+/* styles/globals.css */
+/* Радикальное решение для скрытия всех оверлеев ошибок Next.js */
+
+/* Старые селекторы Next.js */
+[data-nextjs-dialog],
+[data-nextjs-dialog-overlay],
+[data-nextjs-error-dialog],
+[data-nextjs-toast],
+[data-nextjs-reset-dialog] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  position: absolute !important;
+  top: -9999px !important;
+  left: -9999px !important;
+  z-index: -9999 !important;
+  width: 0 !important;
+  height: 0 !important;
+  overflow: hidden !important;
+}
+
+/* Новые селекторы Next.js 15+ */
+div[role="dialog"][aria-modal="true"],
+[data-nextjs-dev-dialog],
+[data-nextjs-build-error],
+[data-nextjs-refresh],
+/* Общие селекторы для всех возможных оверлеев */
+div[style*="position: fixed"][style*="z-index: 9999"],
+div[style*="position: fixed"][style*="background-color: rgba(0, 0, 0, 0.5)"] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* Сбрасываем стили для body при появлении оверлеев */
+body[style*="overflow: hidden"][style*="padding-right"] {
+  overflow: auto !important;
+  padding-right: 0 !important;
+}
+
+/* Скрываем полностью оверлей на Next.js 15 */
+html[data-nextjs-dialog-overlay],
+html[data-nextjs-dialog-active],
+html[data-nextjs-error-active] {
+  overflow: auto !important;
+}
+
+html[data-nextjs-dialog-overlay] body,
+html[data-nextjs-dialog-active] body,
+html[data-nextjs-error-active] body {
+  overflow: auto !important;
+}
+
+
+@keyframes blob {
+  0% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  33% {
+    transform: translate(30px, -50px) scale(1.1);
+  }
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
+  100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+}
+
+.animate-blob {
+  animation: blob 7s infinite;
+}
+
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+
+.animation-delay-4000 {
+  animation-delay: 4s;
+}
+
+.animation-delay-500 {
+  animation-delay: 0.5s;
+}
+
+@keyframes slow-pulse {
+  0%, 100% {
+    opacity: 0.1;
+  }
+  50% {
+    opacity: 0.2;
+  }
+}
+
+.animate-slow-pulse {
+  animation: slow-pulse 5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+@keyframes blob {
+  0% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  33% {
+    transform: translate(30px, -50px) scale(1.1);
+  }
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
+  100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+}
+
+.animate-blob {
+  animation: blob 7s infinite;
+}
+
+.animation-delay-2 {
+  animation-delay: 2s;
+}
+
+.animation-delay-4 {
+  animation-delay: 4s;
+}

@@ -9,6 +9,18 @@
     --text-secondary: #4b5563;
     --border: #e5e7eb;
     --accent: #10b981;
+    --text-color: #000000;
+    --main-search: #e4e4e4;
+    --main-text-color: #333;
+    --more-info: #555;
+    --try-btn: white;
+    --panel: #f0f0f0;
+    --settings: #eee;
+    --sidebar-border: #ccc;
+    --canvas: #c1bdbd;
+    --toolbar-border: #ccc;
+    --active-panel: #d8d8d8;
+    
   }
   
   /* Определяем переменные для темной темы, которые будут применяться при наличии класса dark */
@@ -20,6 +32,17 @@
     --text-secondary: #9ca3af;
     --border: #333333;
     --accent: #34d399;
+    --text-color: #ffffff;
+    --main-search: #ffffff;
+    --main-text-color: #ffffffe5;
+    --more-info: #ffffffd0;
+    --try-btn: black;
+    --panel: #292929;
+    --settings: #292929;
+    --sidebar-border: black;
+    --canvas: #242424;
+    --toolbar-border: #292929;
+    --active-panel: #1f1f1f;
   }
   
   /* Можно также добавить плавные переходы между темами */

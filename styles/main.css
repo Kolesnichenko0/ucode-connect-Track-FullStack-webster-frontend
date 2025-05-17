@@ -1,0 +1,224 @@
+
+
+/*Main*/
+
+  .page {
+    font-family: 'Segoe UI', Tahoma, Verdana, sans-serif;
+    line-height: 1.6;
+    height: 100vh;
+    overflow-y: auto;
+    scroll-behavior: smooth;
+    scroll-snap-type: y mandatory;
+    scrollbar-width: none;
+  }
+  
+  .snap-section {
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+    transition: transform 0.7s ease;
+  }
+  
+  .page section {
+    padding: 80px 20px;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+  }
+  
+  .page .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    margin-top: -70px;
+  }
+
+  #tools .container, #audience .container {
+    margin-top: -170px;
+  }
+  
+  .page .flex {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 35px;
+    /*justify-content: center;*/
+  }
+  
+  .image-box, .team-member, .video-box {
+    background-color: #e4e4e4;
+    text-align: center;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  }
+  
+  .image-box, .video-box {
+    width: 170px;
+    height: 140px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+  }
+
+  .video-box {
+    width: 340px;
+    height: 210px;
+  }
+
+  .tool-video p {
+    margin-bottom: 12px;
+  }
+
+  .team-member p {
+    text-align: left;
+    margin-top: 20px;
+    color: black;
+  }
+
+  .frontend {
+    margin-bottom: 280px;
+  }
+
+  .backend {
+    margin-top: 280px;
+  }
+
+  .team-member {
+    width: 230px;
+  }
+
+  #team h2 {
+    margin-bottom: 38px;
+  }
+
+  #audience h2 {
+    margin-bottom: 48px;
+  }
+  
+  .team-member, .tool-video {
+   /* flex: 1 1 250px;*/
+   transition: transform 0.3s ease;
+  }
+  
+  .team-member:hover, .tool-video:hover {
+    transform: translateY(-5px);
+  }
+  
+  .sphere {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    margin: 10px auto;
+    margin-right: 25px;
+    border: 2px solid white;
+    /*background: #bbb;*/
+  }
+
+  .sphere img {
+    width: 60px;
+    height: 57px;
+  }
+
+  .bottom-sphere {
+    margin-top: 200px;
+  }
+  
+  .page h2 {
+    margin-bottom: 30px;
+    font-size: 2.32rem;
+    color: var(--main-text-color);
+  }
+  
+  .page h3 {
+    margin-bottom: 10px;
+    color: var(--more-info);
+  }
+  
+  .slogan {
+    display: flex;
+    align-items: center;
+    gap: 140px;
+  }
+
+  #slogan {
+    position: relative;
+  }
+  
+  .slogan-text {
+    max-width: 750px;
+    text-align: left;
+    align-self: flex-start;
+    margin-top: -5px;
+    position: relative;
+  }
+
+  .page .main-info {
+    margin-left: 3px;
+  }
+  
+  .slogan-image {
+    max-width: 390px;
+    height: auto;
+  }
+  
+  .page .btn {
+    display: inline-block;
+    margin-top: 90px;
+    padding: 10px 20px;
+    background-color: var(--text-color);
+    color: var(--try-btn);
+    text-decoration: none;
+    border-radius: 8px;
+    position: absolute;
+    left: 0px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.7);
+  }
+  
+  .page .btn:hover {
+    background-color: rgba(0, 0, 0, 0.788);
+  }
+
+  .audience-item {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .audience-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 20px;
+    text-align: center;
+  }
+
+  .more-info {
+    text-align: center;
+    margin-top: 20px;
+    font-weight: 500;
+    color: var(--more-info);
+    position: absolute;
+    bottom: 70px;
+    left: 47%;
+    font-size: 18px;
+  }
+  
+  .more-info span {
+    display: block;
+    margin-bottom: -20px;
+  }
+
+  .arrow {
+    font-size: 40px;
+    animation: bounce 2s infinite;
+    display: inline-block;
+    margin-top: 5px;
+  }
+  
+  @keyframes bounce {
+    0%, 100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(8px);
+    }
+  }

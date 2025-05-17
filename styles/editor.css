@@ -1,0 +1,159 @@
+.wrapper {
+    display: flex;
+    height: 100vh;
+    font-family: sans-serif;
+  }
+  
+  .sidebar, .panel {
+    width: 70px;
+    /*background-color: var(--sidebar);*/ /*#f0f0f0*/
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid var(--sidebar-border);
+  }
+
+  .panel {
+    width: 300px;
+    padding: 10px;
+    background-color: var(--panel);
+    transition: background-color 0.3s ease; 
+  }
+  
+  .active-panel {
+    background-color: var(--active-panel);
+  }
+  
+  .menu {
+    display: flex;
+    flex-direction: column;
+    padding: 13px;
+    gap: 20px;
+  }
+  
+  .menu button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s ease;
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+  }
+
+  .menu button:hover {
+    background-color: var(--active-panel); /*#dfdede*/
+  }
+
+  .menu img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+  }
+  
+  .library {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    border-top: 1px solid #ccc;
+  }
+  
+  .tabs {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  
+  .tabs span {
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 14px;
+  }
+  
+  .active {
+    font-weight: bold;
+    text-decoration: underline;
+    color: var(--text-color);
+  }
+  
+  .search {
+    padding: 5px;
+    margin-bottom: 10px;
+  }
+  
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  
+  .gridItem {
+    background-color: #ddd;
+    height: 60px;
+  }
+  
+  .editorArea {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    /*background: #fff;*/
+  }
+  
+  .toolbar {
+    display: flex;
+    justify-content: flex-start;
+    padding: 10px;
+    gap: 10px;
+    border-bottom: 1px solid var(--toolbar-border);
+  }
+  
+  .toolbar button {
+    padding: 5px 10px;
+    cursor: pointer;
+  }
+  
+  .save {
+    margin-left: auto;
+  }
+  
+  .canvas {
+    flex: 1;
+    margin: 20px;
+    background-color: var(--canvas);
+    width: 1080px;
+    max-height: 1080px;
+    height: 100%;
+  }
+  
+  .settings {
+    width: 350px;
+    background-color: var(--panel); /*#eee*/
+    padding: 20px;
+    border-left: 1px solid var(--sidebar-border);
+  }
+
+  #undo-icon, #redo-icon {
+    width: 25px;
+  }
+
+  #save-icon {
+    width: 30px;
+  }
+
+  #elements-icon {
+    width: 50px;
+  }
+
+  #text-icon, #images-icon {
+    width: 30px;
+  }
+
+  #instr-icon {
+    width: 34px;
+  }
+
+  #paint-icon {
+    width: 28px;
+  }
+  

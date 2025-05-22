@@ -17,7 +17,7 @@
     --panel: #f0f0f0;
     --settings: #eee;
     --sidebar-border: #ccc;
-    --canvas: #c1bdbd;
+    --canvas: white; /*#c1bdbd*/
     --toolbar-border: #ccc;
     --active-panel: #d8d8d8;
     
@@ -40,7 +40,7 @@
     --panel: #292929;
     --settings: #292929;
     --sidebar-border: black;
-    --canvas: #242424;
+    --canvas: #d8d8d8; /*#242424*/
     --toolbar-border: #292929;
     --active-panel: #1f1f1f;
   }

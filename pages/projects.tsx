@@ -1,5 +1,6 @@
 import '../styles/projects.css';
 import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import projectService from '../services/projectService';
 import ProjectCard from '../components/ProjectCard';
 import PopupWindow from '../components/PopupWindow'
@@ -51,8 +52,17 @@ export default function MyProjects() {
             {
                 isOpenModal && <PopupWindow setIsOpenModal={setIsOpenModal}/>
             }
-            <h2>Recent projects</h2>
-            <div className='recent-projects-part'>
+            <motion.h2
+                initial={{ opacity: 0, y: 50 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0 }}className='section-title'>
+                    Templates
+            </motion.h2>
+            <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }} 
+            className='tmp-projects-part'>
                 
                 {/*
                     projects.map((project) => (*/
@@ -66,9 +76,19 @@ export default function MyProjects() {
                     </>
                    /* ))
                 */}
-            </div>
-            <h2>Your projects</h2>
-            <div className='all-projects-part'>  
+            </motion.div>
+            <motion.h2 
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+            className='section-title'>
+                Your projects
+            </motion.h2>
+            <motion.div 
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.6 }}
+            className='all-projects-part'>  
                 <>
                     <ProjectCard key={1422} project={project}/>
                     <ProjectCard key={1243} project={project}/>
@@ -77,26 +97,26 @@ export default function MyProjects() {
                     <ProjectCard key={1421} project={project}/>
                     <ProjectCard key={1112} project={project}/>
                 </>
-            </div>
-            <h2>Templates</h2>
-            <div className='tmp-projects-part'>
+            </motion.div>
+            <motion.h2 
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.8 }}
+            className='section-title'>
+                Recent projects
+            </motion.h2>
+            <motion.div 
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.9 }}
+            className='recent-projects-part'>
                 
                 <>        
                     <ProjectCard key={1422} project={project}/>
                     <ProjectCard key={1243} project={project}/>
                     <ProjectCard key={1342} project={project}/>
                 </>
-            </div>
-            {/*<div id='main-pagination' className='pagination'>
-            {Array.from({ length: totalPages }, (_, index) => (
-                <button
-                    key={index + 1}
-                    onClick={() => setCurrentPage(index + 1)}
-                    className={currentPage === index + 1 ? 'active' : 'inactive'}>
-                        {index + 1}
-                </button>
-            ))}
-        </div>*/}
+            </motion.div>
         </div>
     </div>
     </>);

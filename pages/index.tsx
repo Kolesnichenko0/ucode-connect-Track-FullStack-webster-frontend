@@ -4,7 +4,9 @@ export default function MainPage() {
 
     return (
       <div className="page">
-        <section id="slogan" className="snap-section">
+        <section 
+          id="slogan" 
+          className="snap-section">
           <div className="container slogan">
             <div className="slogan-text">
               <h2>Your Canvas Awaits: Paint Your Dreams!</h2>
@@ -22,7 +24,9 @@ export default function MainPage() {
         </div>
         </section>
   
-        <section id="team" className="snap-section">
+        <section 
+          id="team" 
+          className="snap-section">
           <div className="container">
             <h2>Our team</h2>
             <div className="flex">
@@ -46,7 +50,9 @@ export default function MainPage() {
           </div>
         </section>
   
-        <section id="tools" className="snap-section">
+        <section 
+          id="tools" 
+          className="snap-section">
           <div className="container">
             <h2>Tools</h2>
             <div className="flex">
@@ -69,7 +75,9 @@ export default function MainPage() {
           </div>
         </section>
   
-        <section id="audience" className="snap-section">
+        <section 
+          id="audience" 
+          className="snap-section">
           <div className="container">
             <h2>Target audience</h2>
             <div className="flex audience-grid">

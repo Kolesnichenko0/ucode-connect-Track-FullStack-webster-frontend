@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
+import { formatDate } from '../utils/dateUtils';
 import '../styles/main.css';
 import projectService from '../services/projectService';
 
@@ -30,8 +31,17 @@ const ProjectCard = ({ project}) => {
     return (
       <div>
         <div className='project' id={project.id}  onClick={() => setShowActions(!showActions)}>
-          <img className='project-img' src={/*project.image*/ '/images/img.jpg'} alt='' />
-          <span className='project-title'>{/*project.title */'img1'}</span>
+          <div className='project-image-wrapper'>
+            <img className='project-img' src={/*project.image*/ '/images/img.jpg'} alt='' />
+          </div>
+          <span className='project-title'>{/*project.title */'New Project'}</span>
+          <div className="project-info">
+            <span className="project-type">Post on Instagram</span>
+            <span className='circle-separator'></span>
+            <span className="project-date">
+              {project.updatedAt ? new Date(project.createdAt).toLocaleDateString() : formatDate(new Date(), 'MMM dd, yyyy')}
+            </span>
+          </div>
           {showActions && (
           <div className='project-actions' onClick={(e) => e.stopPropagation()}>
             <div className='option-block'>

@@ -3,19 +3,62 @@ import { useRouter } from 'next/router';
 
 export default function ImagesPanel() {
     const router = useRouter();
+    const [activeTab, setActiveTab] = useState('library');
+    const [searchedTitle, setSearchedTitle] = useState('');
+    const [uploadedImages, setUploadedImages] = useState<string[]>([]);
 
-    return(<>
+    const handleSearch = (e) => {
+        setSearchedTitle(e.target.value);
+    };
+
+    const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const files = e.target.files;
+        if (!files) return;
+
+        const newImages = Array.from(files).map(file => URL.createObjectURL(file));
+        setUploadedImages(prev => [...prev, ...newImages]);
+    }
+
+    return(<div className='images-panel'>
         <div className='tabs'>
-            <span className='active'>Library</span>
-            <span>Uploaded</span>
+            <span onClick={() => setActiveTab('library')} className={`${activeTab === 'library' ? 'active-img-tab' : ''}`}>Library</span>
+            <span onClick={() => setActiveTab('uploaded')} className={`${activeTab !== 'library' ? 'active-img-tab' : ''}`}>Uploaded</span>
         </div>
-        <input type="text" placeholder="Search for an image" className='search' />
-        <img 
-            src='/images/img.jpg' 
-            draggable
-            onDragStart={(e) => {
-                e.dataTransfer.setData('image-src', '/images/img.jpg');
-            }}
-        />
-    </>);
+        { activeTab === 'library' && <>
+            <div className='search-wrapper-img-p'>
+                <input className='search' type="text" value={searchedTitle} placeholder='Search for an image' onChange={handleSearch}></input>
+                <img id='search-img' src='/images/search-icon.png' className='search-icon'></img>
+            </div>
+            <img 
+                className='img-panel-image'
+                src='/images/img.jpg' 
+                draggable
+                onDragStart={(e) => {
+                    e.dataTransfer.setData('image-src', '/images/img.jpg');
+                }}
+            />
+        </>}
+        { activeTab === 'uploaded' && <>
+            <label className='upload-btn'>
+                <input type="file" 
+                multiple
+                accept=".jpeg, .png, .jpg" 
+                onChange={handleUpload} />
+                Upload photo
+            </label>
+            <div className='uploaded-images'>
+                {uploadedImages.map((src, index) => (
+                    <img
+                        key={index}
+                        className='img-panel-image'
+                        src={src}
+                        draggable
+                        onDragStart={(e) => {
+                            e.dataTransfer.setData('image-src', src);
+                        }}
+                    />
+                ))}
+            </div>
+        </>}
+    </div>);
 }

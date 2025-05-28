@@ -1,34 +1,36 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/router';
+import { HuePicker } from 'react-color';
 
 const templates = {
     photo: [
-      { name: '12 mpx 4:3', size: '4032x3024' },
-      { name: '8 mpx 4:3', size: '3264x2448' },
-      { name: 'Landscape 3x2 in', size: '900x600' },
-      { name: 'Landscape 6x4 in', size: '1800x1200' },
-      { name: 'Portrait 4x6 in', size: '1200x1800' },
+      { name: '12 mpx 4:3', size: '1600x1200', thumbnail: 'https://static.thenounproject.com/png/11204-200.png' },
+      { name: '8 mpx 4:3', size: '1280x960', thumbnail: 'https://static.thenounproject.com/png/11204-200.png'},
+      { name: 'Landscape 3x2 in', size: '900x600', thumbnail: 'https://static.thenounproject.com/png/11204-200.png' },
+      { name: 'Landscape 6x4 in', size: '1200x800', thumbnail: 'https://static.thenounproject.com/png/11204-200.png' },
+      { name: 'Portrait 2x3 in', size: '600x900', thumbnail: 'https://static.thenounproject.com/png/11204-200.png' },
     ],
     social: [
-      { name: 'Instagram Post', size: '1080x1080' },
-      { name: 'Facebook Cover', size: '820x312' },
-      { name: 'YouTube Thumbnail', size: '1280x720' },
+      { name: 'Instagram Post', size: '1080x1080', thumbnail: '/images/instagram.png' },
+      { name: 'Facebook Cover', size: '820x312', thumbnail: '/images/facebook.png'},
+      { name: 'YouTube Thumbnail', size: '1280x720', thumbnail: '/images/youtube.png'},
     ],
     web: [
-      { name: 'Web Banner', size: '1600x400' },
-      { name: 'Website Header', size: '1920x600' },
+      { name: 'Web Banner', size: '1600x400', thumbnail: '/images/web.png' },
+      { name: 'Website Header', size: '1200x400', thumbnail: '/images/web.png' },
     ],
 };
 
 const PopupWindow = ({setIsOpenModal}) => {
     const router = useRouter();
     const [tab, setTab] = useState<'photo' | 'social' | 'web'>('photo');
-    const [title, setTitle] = useState('');
+    const [title, setTitle] = useState('Untitled');
+    const [activeTmp, setActiveTmp] = useState('');
     const [description, setDescription] = useState('');
-    const [width, setWidth] = useState(1920);
-    const [height, setHeight] = useState(1080);
+    const [width, setWidth] = useState(900);
+    const [height, setHeight] = useState(600);
     const [backgroundColor, setBackgroundColor] = useState('#ffffff');
-    const [isTransparent, setIsTransparent] = useState(false);
+    const [isTransparent, setIsTransparent] = useState(true);
 
 
     const handleTemplateClick = (size: string) => {
@@ -43,7 +45,7 @@ const PopupWindow = ({setIsOpenModal}) => {
             onClick={() => setIsOpenModal(false)}
         ></div>
 
-        <div className='popup-window'>
+        <div className='popup-window' onClick={(e) => e.stopPropagation()}>
             <button className="popup-close-btn" onClick={() => setIsOpenModal(false)}>
                     &times;
             </button>
@@ -62,10 +64,12 @@ const PopupWindow = ({setIsOpenModal}) => {
                     {templates[tab].map(template => (
                         <div
                         key={template.name}
-                        onClick={() => handleTemplateClick(template.size)}
-                        className='popup-template-item'
+                        onClick={() => {setActiveTmp(template.name); handleTemplateClick(template.size)}}
+                        className={`popup-template-item ${activeTmp === template.name ? 'active-tmp' : ''}`}
                         >
-                            <div className='popup-template-thumbnail' />
+                            <div className='popup-template-thumbnail'>
+                              <img className='popup-tmp-img' src={template.thumbnail} alt={template.name} />
+                            </div>
                             <div className='popup-template-name'>{template.name}</div>
                             <div className='popup-template-size'>{template.size} px</div>
                         </div>
@@ -75,14 +79,20 @@ const PopupWindow = ({setIsOpenModal}) => {
 
             <div className='popup-right'>
             <label className='popup-label'>Title</label>
-            <input type='text' className='popup-input'></input>
+            <input type='text' className='popup-input' value={title} onChange={(e) => setTitle(e.target.value)} required></input>
             <label className='popup-label'>Description</label>
-            <input type='text' className='popup-input'></input>
-            <label className='popup-label'>Height (in px)</label>
-            <input type='number' className='popup-input' min='100' max='1000' placeholder='1080'></input>
-            <label className='popup-label'>Width (in px)</label>
-            <input type='number' className='popup-input' min='100' max='1200'  placeholder='1080'></input>
-            
+            <input type='text' className='popup-input' value={description} onChange={(e) => setDescription(e.target.value)}></input>
+            <div className='size-settings'>
+              <div>
+                <label className='popup-label'>Height (in px)</label>
+                <input id='height-input' value={height} onChange={(e) => setHeight(Number(e.target.value))} type='number' className='popup-input' min='100' max='1080' placeholder='1080' required></input>
+              </div>
+              <div>
+                <label id='width-label' className='popup-label wh-input'>Width (in px)</label>
+                <input id='width-input' value={width} onChange={(e) => setWidth(Number(e.target.value))} type='number' className='popup-input' min='100' max='1200'  placeholder='1080' required></input>
+              </div>
+            </div>
+                        
             <div className='popup-bg-section'>
               <label className='popup-label'>Background</label>
               <div className='popup-bg-options'>
@@ -94,17 +104,43 @@ const PopupWindow = ({setIsOpenModal}) => {
                 <span className='popup-bg-text'>Transparent</span>
               </div>
               {!isTransparent && (
-                <input
-                  type='color'
-                  value={backgroundColor}
-                  onChange={(e) => setBackgroundColor(e.target.value)}
-                  className='popup-input popup-color-picker'
-                />
+                <div className="popup-color-picker-wrapper">
+                  <HuePicker
+                    color={backgroundColor}
+                    onChangeComplete={(color) => setBackgroundColor(color.hex)}
+                    styles={{
+                      default: {
+                        picker: {
+                          width: '89%',
+                          boxSizing: 'border-box',
+                          height: '80px',
+                        }
+                      }
+                    }}
+                  />
+                </div>
               )}
             </div>
             
-            <button id='popup-create-btn' className='popup-btn' onClick={() => {setIsOpenModal(false), router.push('/editor')} }>
-            Create something incredible
+            <button 
+            id='popup-create-btn' 
+            className='popup-btn' 
+            onClick={() => {
+              setIsOpenModal(false),
+              localStorage.removeItem('canvas-objects'),
+              router.push({
+                pathname: '/editor',
+                query: {
+                  title,
+                  description,
+                  width,
+                  height,
+                  isTransparent,
+                  backgroundColor,
+                },
+              });
+            } }>
+              Create something incredible
             </button>
             </div> 
         </div>

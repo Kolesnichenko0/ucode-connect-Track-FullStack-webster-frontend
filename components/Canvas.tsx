@@ -15,7 +15,7 @@ type DrawingLineObject = {
   globalCompositeOperation: 'source-over' | 'destination-out';
 };
 
-export default function Canvas({ settings, activeTool, setActiveTool, paintTool, paintSettings, objects, setObjects, selectedId, setSelectedId }) {
+export default function Canvas({ settings, activeTool, setActiveTool, paintTool, paintSettings, objects, setObjects, selectedId, setSelectedId, textSettings }) {
   const [hasLoaded, setHasLoaded] = useState(false);
   const [showFormats, setShowFormats] = useState(false);
   const [isDrawing, setIsDrawing] = useState(false);
@@ -43,6 +43,7 @@ export default function Canvas({ settings, activeTool, setActiveTool, paintTool,
     line: 'line',
     arrow: 'arrow',
     'curve-line': 'curve-line',
+    text: 'text',
   };
 
   useEffect(() => {
@@ -156,19 +157,37 @@ export default function Canvas({ settings, activeTool, setActiveTool, paintTool,
       if (activeTool) {
         const pointerPosition = stageRef.current.getPointerPosition();
   
-        const newShape: CanvasObject = {
-          id: `shape-${Date.now()}`,
-          type: shapeMap[activeTool],
-          x: pointerPosition.x,
-          y: pointerPosition.y,
-          width: activeTool === 'rectangle' ? 200 : 100,
-          height: 100,
-          fill: 'black',
-        };
+        let newShape: CanvasObject;
+
+        if (activeTool === 'text') {
+          newShape = {
+            id: `text-${Date.now()}`,
+            type: 'text',
+            x: pointerPosition.x,
+            y: pointerPosition.y,
+            text: textSettings?.text || 'Input text',
+            fontSize: textSettings?.fontSize || 24,
+            fill: textSettings?.fill || '#000000',
+            fontFamily: textSettings?.fontFamily || 'Arial',
+            fontStyle: textSettings?.fontStyle || 'normal',
+            fontVariant: textSettings?.fontVariant || 'normal',
+            textDecoration: textSettings?.textDecoration || 'none',
+          };
+        } else {
+          newShape = {
+            id: `shape-${Date.now()}`,
+            type: shapeMap[activeTool],
+            x: pointerPosition.x,
+            y: pointerPosition.y,
+            width: activeTool === 'rectangle' ? 200 : 100,
+            height: 100,
+            fill: 'black',
+          };
+        }
   
         setObjects(prev => [...prev, newShape]);
         setActiveTool(null);
-      } 
+      }
       else if (paintTool === 'brush' || paintTool === 'eraser') {
         const stage = stageRef.current;
         const point = stage.getPointerPosition();
@@ -205,7 +224,7 @@ export default function Canvas({ settings, activeTool, setActiveTool, paintTool,
 
   const handleMouseUp = () => {
     if (isDrawing && currentLine) {
-      setObjects(prev => [...prev, currentLine]); 
+      setObjects(prev => [...prev, currentLine]);
       setCurrentLine(null);
       setIsDrawing(false);
     }
@@ -216,6 +235,37 @@ export default function Canvas({ settings, activeTool, setActiveTool, paintTool,
       const newObjects = objects.filter((o) => o.id !== selectedId);
       setObjects(newObjects);
       setSelectedId(null);
+    }
+
+    if (selectedId && ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+      e.preventDefault();
+
+      const moveDistance = e.shiftKey ? 10 : 1;
+
+      setObjects(prev => prev.map(obj => {
+        if (obj.id === selectedId) {
+          let newX = obj.x;
+          let newY = obj.y;
+
+          switch (e.key) {
+            case 'ArrowUp':
+              newY = Math.max(0, obj.y - moveDistance);
+              break;
+            case 'ArrowDown':
+              newY = Math.min(height - (obj.height || 0), obj.y + moveDistance);
+              break;
+            case 'ArrowLeft':
+              newX = Math.max(0, obj.x - moveDistance);
+              break;
+            case 'ArrowRight':
+              newX = Math.min(width - (obj.width || 0), obj.x + moveDistance);
+              break;
+          }
+
+          return { ...obj, x: newX, y: newY };
+        }
+        return obj;
+      }));
     }
   }
 
@@ -321,7 +371,14 @@ export default function Canvas({ settings, activeTool, setActiveTool, paintTool,
             if (obj.type === 'rect') {
               return <Rect key={obj.id} {...commonProps} />;
             } else if (obj.type === 'text') {
-              return <Text key={obj.id} {...commonProps} />;
+              return <Text
+                key={obj.id}
+                {...commonProps}
+                fontFamily={obj.fontFamily || 'Arial'}
+                fontStyle={obj.fontStyle || 'normal'}
+                fontWeight={obj.fontVariant === 'bold' ? 'bold' : 'normal'}
+                textDecoration={obj.textDecoration || 'none'}
+              />;
             } else if (obj.type === 'image') {
               return <CanvasImage
                 key={obj.id}
@@ -372,7 +429,17 @@ export default function Canvas({ settings, activeTool, setActiveTool, paintTool,
               lineJoin="round"
             />
           )}
-          {selectedId && <Transformer ref={trRef} />}
+            {selectedId && <Transformer
+                ref={trRef}
+                padding={2}
+                borderStroke="#3b82f6"
+                borderStrokeWidth={1.5}
+                anchorStroke="#3b82f6"
+                anchorStrokeWidth={1.5}
+                anchorFill="#ffffff"
+                anchorSize={8}
+                rotateAnchorOffset={30}
+            />}
         </Layer>
 
       </Stage>

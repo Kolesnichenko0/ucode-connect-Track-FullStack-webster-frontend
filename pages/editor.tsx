@@ -4,6 +4,8 @@ import ImagesPanel from '../components/ImagesPanel';
 import ElementsPanel from '../components/ElementsPanel';
 import InfoPanel from '../components/InfoPanel';
 import PaintPanel from '../components/PaintPanel';
+import TextPanel from '../components/TextPanel';
+import Tooltip from '../components/Tooltip';
 import { useTheme } from '../contexts/ThemeContext';
 import { CanvasObject } from '../types/CanvasObject';
 import dynamic from 'next/dynamic';
@@ -18,6 +20,15 @@ export default function EditorPage() {
   const [objects, setObjects] = useState<CanvasObject[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [paintTool, setPaintTool] = useState<'brush' | 'eraser' | null>(null);
+  const [textSettings, setTextSettings] = useState({
+    text: 'Input text',
+    fontSize: 24,
+    fontFamily: 'Arial',
+    fill: '#000000',
+    fontStyle: 'normal',
+    fontVariant: 'normal',
+    textDecoration: 'none'
+  });
   const [settings, setSettings] = useState({
     title: '',
     description: '',
@@ -56,7 +67,7 @@ export default function EditorPage() {
     else if (savedInfo) {
       setSettings(JSON.parse(savedInfo));
     }
-    
+
   }, [router.query]);
 
   useEffect(() => {
@@ -91,13 +102,27 @@ export default function EditorPage() {
     <div className='wrapper'>
       <div className='sidebar'>
         <div className='menu'>
-          <button id='edit-info-btn'><img id='edit-info-icon' src={`/images/editor/edit-info${isDarkMode? '_white': ''}.png`} alt='Edit Info' onClick={() => {handleLeftTabClick('edit-info')}}/></button>
-          <button id='elements-btn'><img id='elements-icon' src={`/images/editor/elements${isDarkMode? '_white': ''}.png`} alt='Elements' onClick={() => {handleLeftTabClick('elements')}}/></button>
-          <button id='text-btn'><img id='text-icon' src={`/images/editor/text${isDarkMode? '_white': ''}.png`} alt='Text' onClick={() => {handleLeftTabClick('text')}}/></button>
-          <button id='images-btn'><img id='images-icon' src={`/images/editor/images${isDarkMode? '_white': ''}.png`} alt='Images' onClick={() => {handleLeftTabClick('images')}}/></button>
-          <button id='edit-img-btn'><img id='edit-img-icon' src={`/images/editor/edit-img${isDarkMode? '_white': ''}.png`} alt='Edit image' onClick={() => {handleLeftTabClick('edit-img')}}/></button>
-          <button id='paint-btn'><img id='paint-icon' src={`/images/editor/paint${isDarkMode? '_white': ''}.png`} alt='Paint' onClick={() => {handleLeftTabClick('paint')}}/></button>
-          <button id='instruction-btn'><img id='instruction-icon' src={`/images/editor/instruction${isDarkMode? '_white': ''}.png`} alt='Instruction' onClick={() => {handleLeftTabClick('instruction')}}/></button>
+          <Tooltip title="Test" description="Description test" image={`/images/tooltip/lasso-info.png`}>
+            <button id='edit-info-btn'><img id='edit-info-icon' src={`/images/editor/edit-info${isDarkMode? '_white': ''}.png`} alt='Edit Info' onClick={() => {handleLeftTabClick('edit-info')}}/></button>
+          </Tooltip>
+          <Tooltip title="Test" description="Description test" image={`/images/tooltip/lasso-info.png`}>
+            <button id='elements-btn'><img id='elements-icon' src={`/images/editor/elements${isDarkMode? '_white': ''}.png`} alt='Elements' onClick={() => {handleLeftTabClick('elements')}}/></button>
+          </Tooltip>
+          <Tooltip title="Test" description="Description test" image={`/images/tooltip/lasso-info.png`}>
+            <button id='text-btn'><img id='text-icon' src={`/images/editor/text${isDarkMode? '_white': ''}.png`} alt='Text' onClick={() => {handleLeftTabClick('text')}}/></button>
+          </Tooltip>
+          <Tooltip title="Test" description="Description test" image={`/images/tooltip/lasso-info.png`}>
+            <button id='images-btn'><img id='images-icon' src={`/images/editor/images${isDarkMode? '_white': ''}.png`} alt='Images' onClick={() => {handleLeftTabClick('images')}}/></button>
+          </Tooltip>
+          <Tooltip title="Test" description="Description test" image={`/images/tooltip/lasso-info.png`}>
+            <button id='edit-img-btn'><img id='edit-img-icon' src={`/images/editor/edit-img${isDarkMode? '_white': ''}.png`} alt='Edit image' onClick={() => {handleLeftTabClick('edit-img')}}/></button>
+          </Tooltip>
+          <Tooltip title="Test" description="Description test" image={`/images/tooltip/lasso-info.png`}>
+            <button id='paint-btn'><img id='paint-icon' src={`/images/editor/paint${isDarkMode? '_white': ''}.png`} alt='Paint' onClick={() => {handleLeftTabClick('paint')}}/></button>
+          </Tooltip>
+          <Tooltip title="Test" description="Description test" image={`/images/tooltip/lasso-info.png`}>
+            <button id='instruction-btn'><img id='instruction-icon' src={`/images/editor/instruction${isDarkMode? '_white': ''}.png`} alt='Instruction' onClick={() => {handleLeftTabClick('instruction')}}/></button>
+          </Tooltip>
         </div>
         
       </div>
@@ -109,7 +134,13 @@ export default function EditorPage() {
           <ElementsPanel activeTool={activeTool} setActiveTool={setActiveTool} selectedObject={objects.find(obj => obj.id === selectedId)} setObjects={setObjects}/>
         }
         {activeLeftTab === 'text' &&
-        <></>
+          <TextPanel
+            activeTool={activeTool}
+            setActiveTool={setActiveTool}
+            selectedObject={objects.find(obj => obj.id === selectedId)}
+            setObjects={setObjects}
+            onTextSettingsChange={setTextSettings}
+          />
         }
         {activeLeftTab === 'images' &&
           <ImagesPanel/>
@@ -129,11 +160,12 @@ export default function EditorPage() {
           activeTool={activeTool}
           setActiveTool={setActiveTool}
           paintTool={paintTool}
-          paintSettings={paintSettings}  
+          paintSettings={paintSettings}
           objects={objects}
           setObjects={setObjects}
           selectedId={selectedId}
-          setSelectedId={setSelectedId}/>
+          setSelectedId={setSelectedId}
+          textSettings={textSettings}/>
       </main>
      
       { isOpenRight &&

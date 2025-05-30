@@ -35,20 +35,6 @@ uploadAvatar: async (formData: FormData, userId: string) => {
     })
     return response.data
 },
-getUserCompany: async (userId: string) => {
-  const response = await axios.get(`${API_URL}/${userId}/companies`);
-  return response.data;
-},
-
- getUserEventSubscriptions: async (userId: string) => {
-  const response = await axios.get(`${API_URL}/${userId}/subscriptions/events`);
-  return response.data;
-},
-
-getUserCompanySubscriptions: async (userId: string) => {
-  const response = await axios.get(`${API_URL}/${userId}/subscriptions/companies`);
-  return response.data;
-},
 };
 
 export default userService;

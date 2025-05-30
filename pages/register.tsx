@@ -356,7 +356,7 @@ export default function Register() {
                     <button
                       type="submit"
                       disabled={loading || !!passwordError}
-                      className={`w-full h-12 rounded-none text-center transition-colors ${
+                      className={`w-full h-12 rounded-lg text-center transition-colors ${
                         loading || !!passwordError
                           ? 'bg-gray-200 dark:bg-gray-800 cursor-not-allowed text-gray-400 dark:text-gray-500'
                           : 'bg-black dark:bg-white text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-200'

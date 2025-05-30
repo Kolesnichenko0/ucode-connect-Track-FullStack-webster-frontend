@@ -7,9 +7,7 @@ module.exports = {
   darkMode: 'class', 
   theme: {
     extend: {
-      fontFamily: {
-        sans: ['Inter var', 'sans-serif'],
-      },
+      
       colors: {
         // Monochromatic palette for minimalist design
         mono: {

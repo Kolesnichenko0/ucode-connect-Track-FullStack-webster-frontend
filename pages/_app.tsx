@@ -26,26 +26,27 @@ function MyApp({ Component, pageProps }: AppProps & {Component: NextPage & { hid
   );
 
   useEffect(() => {
-    
-    authService.setupInterceptors();
-    
-    
-    const fetchCsrfToken = async () => {
+    const initializeApp = async () => {
       try {
+        console.log('Fetching CSRF token...');
         await csrfService.fetchCsrfToken();
+        
         csrfService.setupAxiosInterceptors();
+        
+        authService.setupInterceptors();
+        
+        const accessToken = sessionStorage.getItem('accessToken');
+        if (accessToken) {
+          authService.setAuthToken(accessToken);
+        }
+        
+        console.log('App initialization completed');
       } catch (error) {
-        console.error('Failed to fetch CSRF token:', error);
+        console.error('Failed to initialize app:', error);
       }
     };
     
-    
-    const accessToken = sessionStorage.getItem('accessToken');
-    if (accessToken) {
-      axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
-    }
-    
-    fetchCsrfToken();
+    initializeApp();
   }, []);
   
   

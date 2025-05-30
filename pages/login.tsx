@@ -42,7 +42,7 @@ export default function Login() {
           sessionStorage.removeItem('returnUrl');
           router.push(savedReturnUrl);
         } else {
-          router.push('/dashboard');
+          router.push('/projects');
         }
       }
     }
@@ -125,7 +125,7 @@ export default function Login() {
                       required
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="w-full h-10 px-3 border-0 border-b border-gray-300 dark:border-gray-700 bg-transparent focus:border-black dark:focus:border-white focus:outline-none"
+                      className="w-full h-10 px-3  border-0 border-b border-gray-300 dark:border-gray-700 bg-transparent focus:border-black dark:focus:border-white focus:outline-none"
                       placeholder=""
                     />
                   </div>
@@ -143,7 +143,7 @@ export default function Login() {
                         required
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        className="w-full h-10 px-3 pr-10 border-0 border-b border-gray-300 dark:border-gray-700 bg-transparent focus:border-black dark:focus:border-white focus:outline-none"
+                        className="w-full h-10 px-3 pr-10  border-0 border-b border-gray-300 dark:border-gray-700 bg-transparent focus:border-black dark:focus:border-white focus:outline-none"
                         placeholder=""
                       />
                       <button
@@ -188,7 +188,7 @@ export default function Login() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className={`w-full h-12 rounded-none text-center transition-colors ${
+                  className={`w-full h-12 rounded-lg text-center transition-colors ${
                     loading
                       ? 'bg-gray-200 dark:bg-gray-800 cursor-not-allowed'
                       : 'bg-black dark:bg-white text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-200'

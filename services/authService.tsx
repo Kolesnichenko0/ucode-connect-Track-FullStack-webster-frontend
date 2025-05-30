@@ -87,7 +87,7 @@ login: async (loginData: LoginData) => {
       const response = await axios.post<AuthResponse>(`${API_URL}/login`, loginData);
       
       if (response.data.accessToken) {
-        sessionStorage.setItem('accessToken', response.data.accessToken);
+        authService.setAuthToken(response.data.accessToken);
       }
       if (response.data.refreshToken) {
         localStorage.setItem('refreshToken', response.data.refreshToken);
@@ -135,7 +135,7 @@ login: async (loginData: LoginData) => {
       console.error('Logout error:', error);
       throw error;
     } finally {
-      sessionStorage.removeItem('accessToken');
+      authService.clearAuthToken();
       localStorage.removeItem('refreshToken');
       localStorage.removeItem('user');
       userService.clearAuthToken();
@@ -150,8 +150,7 @@ login: async (loginData: LoginData) => {
     try {
       const response = await axios.post<AuthResponse>(`${API_URL}/access-token/refresh`, { refreshToken });
       if (response.data.accessToken) {
-        sessionStorage.setItem('accessToken', response.data.accessToken);
-        userService.setAuthToken(response.data.accessToken);
+        authService.setAuthToken(response.data.accessToken);
       }
       return response.data;
     } catch (error: any) {
@@ -175,20 +174,17 @@ login: async (loginData: LoginData) => {
     return response.data;
   },
 
-  setupInterceptors: () => {
-    axios.interceptors.request.use(
-      (config) => {
-        const token = sessionStorage.getItem('accessToken');
-        if (token) {
-          config.headers['Authorization'] = `Bearer ${token}`;
-        }
-        return config;
-      },
-      (error) => {
-        return Promise.reject(error);
-      }
-    );
+  setAuthToken: (token: string) => {
+    sessionStorage.setItem('accessToken', token);
+    axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+  },
 
+  clearAuthToken: () => {
+    sessionStorage.removeItem('accessToken');
+    delete axios.defaults.headers.common['Authorization'];
+  },
+
+  setupInterceptors: () => {
     axios.interceptors.response.use(
       (response) => response,
       async (error) => {

@@ -62,6 +62,12 @@ export type CanvasObject =
       text: string;
       fontSize: number;
       fill: string;
+      fontFamily?: string;
+      fontStyle?: string;
+      fontVariant?: string;
+      textDecoration?: string;
+      width?: number;
+      height?: number;
       opacity?: number;
     }
   | {

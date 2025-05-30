@@ -321,7 +321,7 @@
 
   /*Elements*/
 
-  .figures, .lines {
+  .figures, .lines, .tools {
     display: flex;
     justify-content: space-evenly;
     gap: 10px;
@@ -329,7 +329,7 @@
     margin-bottom: 15px;
   }
 
-  .figures div, .lines div {
+  .figures div, .lines div, .tools svg {
     margin-top: 15px;
     background-color: #dadada;
     width: 60px;
@@ -344,17 +344,23 @@
     background-color: #bbbbbb !important;
   }
 
-  .properties-panel {
+  .obj-tip {
+    margin-top: 15px;
+    margin-left: 10px;
+    font-size: 15px;
+  }
+
+  .properties-panel, .paint-settings {
     margin-top: 10px;
     margin-left: 10px;
     padding: 5px 10px 5px 0;
   }
 
-  .properties-panel input, .properties-panel select {
+  .properties-panel input, .properties-panel select, .paint-settings input {
     margin-top: 5px;
   }
 
-  .properties-panel input[type="color"] {
+  .properties-panel input[type="color"], .paint-settings input[type="color"] {
     width: 100%;
     border-radius: 10px !important;
     appearance: none;
@@ -368,19 +374,61 @@
     padding: 1px 10px;
   }
 
-  .properties-panel input[type="color"]::-webkit-color-swatch {
+  .properties-panel input[type="color"]::-webkit-color-swatch,
+  .paint-settings input[type="color"]::-webkit-color-swatch{
     border: none;
     border-radius: 10px;
     padding: 0;
   }
-  .properties-panel input[type="color"]::-webkit-color-swatch-wrapper {
+  
+  .properties-panel input[type="color"]::-webkit-color-swatch-wrapper,
+  .paint-settings input[type="color"]::-webkit-color-swatch-wrapper {
     border: none;
     border-radius: 10px;
     padding: 4px 0;
   }
   
-  .properties-panel label {
+  .properties-panel label, .paint-settings label {
     display: flex;
     flex-direction: column;
     margin-bottom: 10px;
   }
+
+/* Info Panel */
+
+.info-panel {
+  margin-left: 12px;
+  margin-top: 1px;
+}
+
+.info-label {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.info-input {
+  border-radius: 10px;
+  background-color: #dadada;
+  border-radius: 20px;
+  margin-bottom: 15px;
+  padding: 2px 10px; 
+  color: black;
+}
+
+.info-size-settings {
+  display: flex;
+  gap: 35px;
+  flex-wrap: wrap;
+}
+
+.info-color-picker-wrapper {
+  margin-top: 10px;
+}
+
+.info-bg-options {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Paint */

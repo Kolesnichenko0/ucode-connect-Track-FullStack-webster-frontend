@@ -83,9 +83,11 @@ export default function ElementsPanel({ activeTool, setActiveTool, selectedObjec
                    </svg>
             </div>
         </div>
-        {selectedObject && (<>
-            
-            <h3>Object Properties</h3>
+        <h3>Object Properties</h3>
+        {!selectedObject &&
+            <div className='obj-tip'>Select object to view properties</div>
+        }
+        {selectedObject && (<>  
             <div className="properties-panel">
                 {typesWithoutLines.includes(selectedObject.type) && (
                     <label>

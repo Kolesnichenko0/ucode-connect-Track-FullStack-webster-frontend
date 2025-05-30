@@ -3,14 +3,23 @@ import jsPDF from 'jspdf';
 import { useTheme } from '../contexts/ThemeContext';
 import { CanvasObject } from '../types/CanvasObject';
 import CanvasImage from './CanvasImage';
-import { Stage, Layer, Rect, Text, Transformer, Circle, Star, Line, Arrow, Group } from 'react-konva';
+import { Stage, Layer, Rect, Text, Transformer, Circle, Star, Line, Arrow } from 'react-konva';
 
-export default function Canvas({ settings, activeTool, setActiveTool, objects, setObjects, selectedId, setSelectedId }) {
-  /*const [objects, setObjects] = useState<CanvasObject[]>([]);*/
-  const [newShape, setNewShape] = useState<CanvasObject | null>(null);
-  /*const [selectedId, setSelectedId] = useState<string | null>(null);*/
+type DrawingLineObject = {
+  id: string;
+  type: 'line';
+  points: number[];
+  stroke: string;
+  strokeWidth: number;
+  opacity: number;
+  globalCompositeOperation: 'source-over' | 'destination-out';
+};
+
+export default function Canvas({ settings, activeTool, setActiveTool, paintTool, paintSettings, objects, setObjects, selectedId, setSelectedId }) {
   const [hasLoaded, setHasLoaded] = useState(false);
   const [showFormats, setShowFormats] = useState(false);
+  const [isDrawing, setIsDrawing] = useState(false);
+  const [currentLine, setCurrentLine] = useState<DrawingLineObject | null>(null);
   const [zoom, setZoom] = useState(1);
   const shapeRefs = useRef({});
   const trRef = useRef<any>(null);
@@ -36,34 +45,11 @@ export default function Canvas({ settings, activeTool, setActiveTool, objects, s
     'curve-line': 'curve-line',
   };
 
-  /*const initialObjects: CanvasObject[] = [
-    {
-      id: 'rect1',
-      type: 'rect',
-      x: 50,
-      y: 60,
-      width: 100,
-      height: 100,
-      fill: 'red',
-    },
-    {
-      id: 'text1',
-      type: 'text',
-      x: 200,
-      y: 100,
-      text: 'Hello World',
-      fontSize: 24,
-      fill: 'black',
-    },
-  ];*/
-
   useEffect(() => {
     const saved = localStorage.getItem('canvas-objects');
     if (saved) {
       setObjects(JSON.parse(saved));
-    }/* else {
-      setObjects(initialObjects);
-    }*/
+    }
     setHasLoaded(true);
   }, []);
 
@@ -153,26 +139,6 @@ export default function Canvas({ settings, activeTool, setActiveTool, objects, s
     e.preventDefault();
     const stage = stageRef.current;
     const pointerPosition = stage.getPointerPosition();
-
-    /*const shapeType = e.dataTransfer.getData('shape');
-    if (shapeType) {
-
-      const konvaType = shapeMap[shapeType];
-      if (konvaType) {
-        const newShape: CanvasObject = {
-          id: `shape-${Date.now()}`,
-          type: konvaType,
-          x: pointerPosition.x,
-          y: pointerPosition.y,
-          width: 100,
-          height: 100,
-          fill: 'green',
-        };
-        setObjects(prev => [...prev, newShape]);
-        return;
-      }
-    }*/
-
     const src = e.dataTransfer.getData('image-src');
     if (src) {
       const newImage: CanvasObject = {
@@ -202,61 +168,48 @@ export default function Canvas({ settings, activeTool, setActiveTool, objects, s
   
         setObjects(prev => [...prev, newShape]);
         setActiveTool(null);
-      } else {
+      } 
+      else if (paintTool === 'brush' || paintTool === 'eraser') {
+        const stage = stageRef.current;
+        const point = stage.getPointerPosition();
+
+        const newLine: DrawingLineObject = {
+          id: `line-${Date.now()}`,
+          type: 'line',
+          points: [point.x, point.y],
+          stroke: paintTool === 'eraser' ? 'white' : paintSettings.fill || '#000',
+          strokeWidth: paintSettings.strokeWidth || 5,
+          opacity: paintSettings.opacity ?? 1,
+          globalCompositeOperation: paintTool === 'eraser' ? 'destination-out' : 'source-over',
+        }
+
+        setIsDrawing(true);
+        setCurrentLine(newLine);
+      }
+      else {
         if( e.target === e.target.getStage()) {
           setSelectedId(null);
         }
-        
       }
   };
 
-  /*const handleMouseDown = (e) => {
-    if (!activeTool) {
-      setSelectedId(null);
-    };
+  const handleMouseMove = (e: any) => {
+    if (!isDrawing || !currentLine) return;
 
     const stage = stageRef.current;
     const point = stage.getPointerPosition();
 
-    setNewShape({
-      id: `shape-${new Date()}`,
-      type: shapeMap[activeTool],
-      x: point.x,
-      y: point.y,
-      width: 0,
-      height: 0,
-      fill: 'green',
-    });
-  };
-
-  const handleMouseMove = (e) => {
-    if (!newShape) return;
-    const stage = stageRef.current;
-    const point = stage.getPointerPosition();
-
-    const newWidth = point.x - newShape.x;
-    const newHeight = point.y - newShape.y;
-
-    setNewShape({
-      ...newShape,
-      width: newWidth,
-      height: newHeight,
-    });
-  };
+    const newPoints = currentLine.points.concat([point.x, point.y]);
+    setCurrentLine({ ...currentLine, points: newPoints });
+  }
 
   const handleMouseUp = () => {
-    if (newShape && newShape.type !== 'text') {
-      if (Math.abs(newShape.width) > 5 && Math.abs(newShape.height) > 5) {
-        const x = newShape.width < 0 ? newShape.x + newShape.width : newShape.x;
-        const y = newShape.height < 0 ? newShape.y + newShape.height : newShape.y;
-        const width = Math.abs(newShape.width);
-        const height = Math.abs(newShape.height);
-        setObjects(prev => [...prev, newShape]);
-      }
-      setNewShape(null);
-      setActiveTool(null); 
+    if (isDrawing && currentLine) {
+      setObjects(prev => [...prev, currentLine]); 
+      setCurrentLine(null);
+      setIsDrawing(false);
     }
-  };*/
+  };
 
   const handleKeyDown = (e: KeyboardEvent) => {
     if (e.key === 'Delete' && selectedId) {
@@ -329,16 +282,14 @@ export default function Canvas({ settings, activeTool, setActiveTool, objects, s
     <div className='canvas' 
         onDragOver={(e) => e.preventDefault()}
         onDrop={(e) => {e.preventDefault(); handleDrop(e);}}>
-          {/*
-            onMouseMove={handleMouseMove}
-            onMouseUp={handleMouseUp}
-        */}
       <Stage  
         ref={stageRef} 
         width={width * zoom}
         height={height * zoom}
         scale={{ x: zoom, y: zoom }}
         onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
         onTouchStart={deselectElement}>
 
         <Layer>
@@ -409,7 +360,19 @@ export default function Canvas({ settings, activeTool, setActiveTool, objects, s
             }
             return null;
           })}
-           {selectedId && <Transformer ref={trRef} />}
+          {currentLine && (
+            <Line
+              key={currentLine.id}
+              points={currentLine.points}
+              stroke={currentLine.stroke}
+              strokeWidth={currentLine.strokeWidth}
+              opacity={currentLine.opacity}
+              globalCompositeOperation={currentLine.globalCompositeOperation}
+              lineCap="round"
+              lineJoin="round"
+            />
+          )}
+          {selectedId && <Transformer ref={trRef} />}
         </Layer>
 
       </Stage>

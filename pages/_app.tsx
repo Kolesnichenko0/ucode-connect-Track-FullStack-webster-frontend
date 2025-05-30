@@ -8,6 +8,7 @@ import csrfService from '../services/csrfService';
 import { useRouter } from 'next/router';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import type { NextPage } from 'next';
 import '../styles/themes.css';
 import { ThemeProvider } from '../contexts/ThemeContext';
 import { ToastContainer } from 'react-toastify';
@@ -15,9 +16,10 @@ import 'react-toastify/dist/ReactToastify.css';
 
 const publicPaths = ['/login', '/register', '/forgot-password', '/reset-password'];
 
-function MyApp({ Component, pageProps }: AppProps) {
+function MyApp({ Component, pageProps }: AppProps & {Component: NextPage & { hideFooter?: boolean }}) {
   const router = useRouter();
   
+  const hideFooter = Component.hideFooter;
   
   const isPublicPath = publicPaths.some(path => 
     router.pathname === path || router.pathname.startsWith('/reset-password/')
@@ -68,7 +70,7 @@ function MyApp({ Component, pageProps }: AppProps) {
             <main className="flex-grow">
               <Component {...pageProps} />
             </main>
-            <Footer />
+            {!hideFooter && <Footer />}
             {/* Add ToastContainer here */}
             <ToastContainer 
               position="top-right"

@@ -29,7 +29,7 @@ const PopupWindow = ({setIsOpenModal}) => {
     const [description, setDescription] = useState('');
     const [width, setWidth] = useState(900);
     const [height, setHeight] = useState(600);
-    const [backgroundColor, setBackgroundColor] = useState('#ffffff');
+    const [backgroundColor, setBackgroundColor] = useState('#dedede');
     const [isTransparent, setIsTransparent] = useState(true);
 
 
@@ -137,6 +137,7 @@ const PopupWindow = ({setIsOpenModal}) => {
                   height,
                   isTransparent,
                   backgroundColor,
+                  new: 'true',
                 },
               });
             } }>

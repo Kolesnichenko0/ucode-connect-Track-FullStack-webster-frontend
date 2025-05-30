@@ -2,6 +2,8 @@ import '../styles/editor.css';
 import { useState, useEffect } from 'react';
 import ImagesPanel from '../components/ImagesPanel';
 import ElementsPanel from '../components/ElementsPanel';
+import InfoPanel from '../components/InfoPanel';
+import PaintPanel from '../components/PaintPanel';
 import { useTheme } from '../contexts/ThemeContext';
 import { CanvasObject } from '../types/CanvasObject';
 import dynamic from 'next/dynamic';
@@ -15,19 +17,28 @@ export default function EditorPage() {
   const [activeTool, setActiveTool] = useState<string | null>(null);
   const [objects, setObjects] = useState<CanvasObject[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [paintTool, setPaintTool] = useState<'brush' | 'eraser' | null>(null);
   const [settings, setSettings] = useState({
     title: '',
     description: '',
     width: 900,
     height: 600,
-    isTransparent: false,
-    backgroundColor: '#ffffff',
+    isTransparent: true,
+    backgroundColor: '#dedede',
+  });
+  const [paintSettings, setPaintSettings] = useState({
+    fill: '#000000',
+    strokeWidth: 5,
+    opacity: 1,
   });
   const { isDarkMode } = useTheme();
   const router = useRouter();
 
   useEffect(() => {
-    if (router.query.width && router.query.height) {
+    const isNewProject = router.query.new === 'true';
+    const savedInfo = localStorage.getItem('editorSettings');
+
+    if (isNewProject && router.query.width && router.query.height) {
       setSettings({
         title: String(router.query.title),
         description: String(router.query.description),
@@ -36,8 +47,21 @@ export default function EditorPage() {
         isTransparent: router.query.isTransparent === 'true',
         backgroundColor: String(router.query.backgroundColor),
       });
+      const { new: _, ...restQuery } = router.query;
+      router.replace({
+        pathname: router.pathname,
+        query: restQuery,
+      }, undefined, { shallow: true });
     }
+    else if (savedInfo) {
+      setSettings(JSON.parse(savedInfo));
+    }
+    
   }, [router.query]);
+
+  useEffect(() => {
+    localStorage.setItem('editorSettings', JSON.stringify(settings));
+  }, [settings]);
 
   const handleLeftTabClick = (tab: string) => {
     if (activeLeftTab === tab) {
@@ -79,7 +103,7 @@ export default function EditorPage() {
       </div>
       {isOpenLeft && <div className='panel'>
         {activeLeftTab === 'edit-info' &&
-          <></>
+          <InfoPanel settings={settings} setSettings={setSettings}/>
         }
         {activeLeftTab === 'elements' &&
           <ElementsPanel activeTool={activeTool} setActiveTool={setActiveTool} selectedObject={objects.find(obj => obj.id === selectedId)} setObjects={setObjects}/>
@@ -94,7 +118,7 @@ export default function EditorPage() {
           <></>
         }
         {activeLeftTab === 'paint' &&
-        <></>
+          <PaintPanel paintTool={paintTool} setPaintTool={setPaintTool} paintSettings={paintSettings} setPaintSettings={setPaintSettings}/>
         }
       </div>
       }
@@ -104,6 +128,8 @@ export default function EditorPage() {
           settings={settings}
           activeTool={activeTool}
           setActiveTool={setActiveTool}
+          paintTool={paintTool}
+          paintSettings={paintSettings}  
           objects={objects}
           setObjects={setObjects}
           selectedId={selectedId}
@@ -125,3 +151,5 @@ export default function EditorPage() {
     </div>
   </>);
 }
+
+EditorPage.hideFooter = true;

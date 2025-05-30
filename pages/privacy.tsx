@@ -6,7 +6,7 @@ const PrivacyPolicyPage = () => {
   return (
     <div className="bg-white dark:bg-gray-900 min-h-screen">
       {/* Header */}
-      <header className="bg-gradient-to-r from-emerald-600 to-teal-600">
+      <header className="bg-black dark:bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="relative z-10">
             <motion.div
@@ -14,8 +14,8 @@ const PrivacyPolicyPage = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
             >
-              <h1 className="text-3xl md:text-4xl font-bold text-white">Privacy Policy</h1>
-              <p className="mt-4 text-emerald-100 text-lg max-w-3xl">
+              <h1 className="text-3xl md:text-4xl font-bold text-white dark:text-black">Privacy Policy</h1>
+              <p className="mt-4 text-gray-400 dark:text-gray-600 text-lg max-w-3xl">
                 We respect your privacy and are committed to protecting your personal data.
                 This privacy policy explains how we collect, use, and safeguard your information.
               </p>
@@ -157,7 +157,7 @@ const PrivacyPolicyPage = () => {
             <motion.div
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="inline-flex items-center px-5 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-sm font-medium hover:from-emerald-600 hover:to-teal-600 transition-all shadow-md"
+              className="inline-flex items-center px-5 py-3 rounded-xl bg-black dark:bg-white text-white dark:text-black text-sm font-medium hover:from-emerald-600 hover:to-teal-600 transition-all shadow-md"
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -167,25 +167,6 @@ const PrivacyPolicyPage = () => {
           </Link>
         </div>
       </main>
-
-      {/* Footer */}
-      <footer className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="text-center">
-            <p className="text-gray-600 dark:text-gray-400 text-sm">
-              © {new Date().getFullYear()} Your Company Name. All rights reserved.
-            </p>
-            <div className="mt-4 flex justify-center space-x-6 text-sm">
-              <Link href="/privacy" className="text-emerald-600 dark:text-emerald-400 font-medium transition-colors">
-                Privacy Policy
-              </Link>
-              <Link href="/terms" className="text-gray-500 hover:text-emerald-500 dark:text-gray-400 dark:hover:text-emerald-400 transition-colors">
-                Terms of Service
-              </Link>
-            </div>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 };

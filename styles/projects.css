@@ -93,23 +93,21 @@ a {
     width: 255px;
     height: 188px;
     object-fit: cover;
-    border-radius: 10px;
+    border-radius: 9px;
 }
 
 .project-image-wrapper {
     width: 100%;
-    /*margin-left: 8px;
-    margin-top: 8px;*/
     height: 180px;
     overflow: hidden;
     margin-bottom: 6px;
 }
 
 .project {
-    color: var(--text-color);
+    color: black;
     position: relative;
     display: inline-block;
-    background: #e4e4e498;
+    background: var(--project-bg);
     border-radius: 10px;
 }
 

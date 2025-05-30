@@ -22,6 +22,7 @@
     --active-panel: #d8d8d8;
     --dropdown-menu-bg: #f0f0f0;
     --option-bg: #b3b3b3;
+    --project-bg: #e4e4e498;
   }
   
   /* Определяем переменные для темной темы, которые будут применяться при наличии класса dark */
@@ -46,6 +47,7 @@
     --active-panel: #1f1f1f;
     --dropdown-menu-bg: #bebebe;
     --option-bg: #e4e4e4;
+    --project-bg: #ffffffe8;
   }
   
   /* Можно также добавить плавные переходы между темами */

@@ -43,72 +43,72 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
-  useEffect(() => {
-    const accessToken = sessionStorage.getItem('accessToken');
-    if (accessToken) {
-      axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
-    }
+  // contexts/AuthContext.tsx
+useEffect(() => {
+  const accessToken = sessionStorage.getItem('accessToken');
+  if (accessToken) {
+    axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
+  }
 
-    const responseInterceptor = axios.interceptors.response.use(
-      (response) => response,
-      async (error) => {
-        const originalRequest = error.config;
-        
-        const isAuthEndpoint = originalRequest.url && (
-          originalRequest.url.includes('/auth/login') ||
-          originalRequest.url.includes('/auth/register') ||
-          originalRequest.url.includes('/login') ||
-          originalRequest.url.includes('/register')
-        );
-        
-        const hasRefreshToken = localStorage.getItem('refreshToken') !== null;
-        
-        if (
-          error.response &&
-          (error.response.status === 401 || error.response.status === 403) &&
-          !originalRequest._retry &&
-          !isAuthEndpoint &&
-          hasRefreshToken
-        ) {
-          originalRequest._retry = true;
-          try {
-            const refreshedTokenData = await authService.refreshToken();
-            if (refreshedTokenData.newRefreshToken) {
-              localStorage.setItem("refreshToken", refreshedTokenData.newRefreshToken);
-            }
-            originalRequest.headers['Authorization'] = `Bearer ${refreshedTokenData.accessToken}`;
-            sessionStorage.setItem('accessToken', refreshedTokenData.accessToken);
-            axios.defaults.headers.common['Authorization'] = `Bearer ${refreshedTokenData.accessToken}`;
-            return axios(originalRequest);
-          } catch (refreshError) {
-            setUser(null);
-            localStorage.removeItem('user');
-            sessionStorage.removeItem('accessToken');
-            localStorage.removeItem('refreshToken');
-            router.push('/login');
-            return Promise.reject(refreshError);
+  const responseInterceptor = axios.interceptors.response.use(
+    (response) => response,
+    async (error) => {
+      const originalRequest = error.config;
+      
+      const isAuthEndpoint = originalRequest.url && (
+        originalRequest.url.includes('/auth/login') ||
+        originalRequest.url.includes('/auth/register') ||
+        originalRequest.url.includes('/login') ||
+        originalRequest.url.includes('/register')
+      );
+      
+      const hasRefreshToken = localStorage.getItem('refreshToken') !== null;
+      
+      if (
+        error.response &&
+        (error.response.status === 401 || error.response.status === 403) &&
+        !originalRequest._retry &&
+        !isAuthEndpoint &&
+        hasRefreshToken
+      ) {
+        originalRequest._retry = true;
+        try {
+          const refreshedTokenData = await authService.refreshToken();
+          if (refreshedTokenData.newRefreshToken) {
+            localStorage.setItem("refreshToken", refreshedTokenData.newRefreshToken);
           }
+          originalRequest.headers['Authorization'] = `Bearer ${refreshedTokenData.accessToken}`;
+          sessionStorage.setItem('accessToken', refreshedTokenData.accessToken);
+          axios.defaults.headers.common['Authorization'] = `Bearer ${refreshedTokenData.accessToken}`;
+          return axios(originalRequest);
+        } catch (refreshError) {
+          setUser(null);
+          localStorage.removeItem('user');
+          sessionStorage.removeItem('accessToken');
+          localStorage.removeItem('refreshToken');
+          router.push('/login');
+          return Promise.reject(refreshError);
         }
-        return Promise.reject(error);
       }
-    );
-
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      try {
-        setUser(JSON.parse(storedUser));
-      } catch (err) {
-        console.error('Failed to parse user from localStorage', err);
-        localStorage.removeItem('user');
-      } finally {
-        setInitialLoading(false);
-      }
+      return Promise.reject(error);
     }
+  );
 
-    return () => {
-      axios.interceptors.response.eject(responseInterceptor);
-    };
-  }, [router]);
+  const storedUser = localStorage.getItem('user');
+  if (storedUser) {
+    try {
+      setUser(JSON.parse(storedUser));
+    } catch (err) {
+      console.error('Failed to parse user from localStorage', err);
+      localStorage.removeItem('user');
+    }
+  }
+  setInitialLoading(false);
+
+  return () => {
+    axios.interceptors.response.eject(responseInterceptor);
+  };
+}, [router]);
 
 const register = async (firstName: string, lastName: string, email: string, password: string) => {
   try {

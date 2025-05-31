@@ -20,7 +20,7 @@ const ProfileContent = ({ user }) => {
     const [isEditing, setIsEditing] = useState(false);
     const [profileData, setProfileData] = useState({
         firstName: user?.firstName || '',
-        lastName: user?.lastName || '',
+        lastName: user?.lastName || null,
         email: user?.email || '',
     });
     const [isSaving, setIsSaving] = useState(false);
@@ -431,7 +431,7 @@ const ProfileContent = ({ user }) => {
                                                         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                                                         <circle cx="12" cy="7" r="4"></circle>
                                                     </svg>
-                                                    <p className="text-gray-900 dark:text-white flex-1">{profileData.firstName || 'Not specified'}</p>
+                                                    <p className="text-gray-900 dark:text-white flex-1">{profileData.firstName}</p>
                                                 </div>
                                             )}
                                         </div>
@@ -456,7 +456,7 @@ const ProfileContent = ({ user }) => {
                                                         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                                                         <circle cx="12" cy="7" r="4"></circle>
                                                     </svg>
-                                                    <p className="text-gray-900 dark:text-white flex-1">{profileData.lastName || 'Not specified'}</p>
+                                                    <p className="text-gray-900 dark:text-white flex-1">{profileData.lastName}</p>
                                                 </div>
                                             )}
                                         </div>

@@ -1,5 +1,6 @@
 import axios from 'axios';
 import userService from './userService';
+import { log } from 'console';
 
 const API_URL = 'http://localhost:8080/api/auth';
 
@@ -20,7 +21,7 @@ interface User {
   firstName: string;
   lastName: string;
   email: string;
-  profilePictureUrl?: string;
+  avatarFileURL?: string;
   profilePictureName?: string;
   countryCode?: string;
   created_at: string;
@@ -86,6 +87,9 @@ login: async (loginData: LoginData) => {
     try {
       const response = await axios.post<AuthResponse>(`${API_URL}/login`, loginData);
       
+      console.log('Server response from /api/auth/login:', response);
+      console.log('Response data:', response.data);
+
       if (response.data.accessToken) {
         authService.setAuthToken(response.data.accessToken);
       }
@@ -93,14 +97,8 @@ login: async (loginData: LoginData) => {
         localStorage.setItem('refreshToken', response.data.refreshToken);
       }
       
-      if (response.data.user && response.data.user.profilePictureName) {
-        const userWithProfileUrl = {
-          ...response.data.user,
-          profilePictureUrl: `http://localhost:8080/uploads/user-avatars/${response.data.user.profilePictureName}`,
-        };
-        
-        localStorage.setItem('user', JSON.stringify(userWithProfileUrl));
-        return { ...response.data, user: userWithProfileUrl };
+      if (response.data.user) {
+        localStorage.setItem('user', JSON.stringify(response.data.user));
       }
       
       return response.data;
@@ -224,7 +222,9 @@ login: async (loginData: LoginData) => {
         return Promise.reject(error);
       }
     );
-  }
+  },
+
+
 };
 
 export default authService;

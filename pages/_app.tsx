@@ -1,11 +1,9 @@
 import { useEffect } from 'react';
 import '../styles/globals.css';
 import type { AppProps } from 'next/app';
-import axios from 'axios';
 import { AuthProvider } from '../contexts/AuthContext';
 import authService from '../services/authService';
 import csrfService from '../services/csrfService';
-import { useRouter } from 'next/router';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import type { NextPage } from 'next';
@@ -13,17 +11,11 @@ import '../styles/themes.css';
 import { ThemeProvider } from '../contexts/ThemeContext';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import ProtectedRoute from '../components/ProtectedRoute';
 
-const publicPaths = ['/login', '/register', '/forgot-password', '/reset-password'];
+function MyApp({ Component, pageProps }: AppProps & { Component: NextPage & { hideFooter?: boolean } }) {
 
-function MyApp({ Component, pageProps }: AppProps & {Component: NextPage & { hideFooter?: boolean }}) {
-  const router = useRouter();
-  
   const hideFooter = Component.hideFooter;
-  
-  const isPublicPath = publicPaths.some(path => 
-    router.pathname === path || router.pathname.startsWith('/reset-password/')
-  );
 
   useEffect(() => {
     const initializeApp = async () => {
@@ -48,8 +40,7 @@ function MyApp({ Component, pageProps }: AppProps & {Component: NextPage & { hid
     
     initializeApp();
   }, []);
-  
-  
+
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const savedTheme = localStorage.getItem('theme') || 'system';
@@ -66,30 +57,30 @@ function MyApp({ Component, pageProps }: AppProps & {Component: NextPage & { hid
   return (
     <ThemeProvider>
       <AuthProvider>
-          <div className="flex min-h-screen flex-col">
-            <Header />
-            <main className="flex-grow">
+        <div className="flex min-h-screen flex-col">
+          <Header />
+          <main className="flex-grow">
+            <ProtectedRoute>
               <Component {...pageProps} />
-            </main>
-            {!hideFooter && <Footer />}
-            {/* Add ToastContainer here */}
-            <ToastContainer 
-              position="top-right"
-              autoClose={5000}
-              hideProgressBar={false}
-              newestOnTop
-              closeOnClick
-              rtl={false}
-              pauseOnFocusLoss
-              draggable
-              pauseOnHover
-              theme="colored"
-            />
-          </div>
+            </ProtectedRoute>
+          </main>
+          {!hideFooter && <Footer />}
+          <ToastContainer 
+            position="top-right"
+            autoClose={5000}
+            hideProgressBar={false}
+            newestOnTop
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+            theme="colored"
+          />
+        </div>
       </AuthProvider>
     </ThemeProvider>
   );
 }
 
 export default MyApp;
-

@@ -1,15 +1,15 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/router';
 import axios from 'axios';
 import authService from '../services/authService';
 import userService from '../services/userService';
 
-interface User {
+export interface User {
   id: string;
   firstName: string;
   lastName: string;
   email: string;
-  profilePictureUrl?: string;
+  avatarFileURL?: string;
   profilePictureName?: string;
   countryCode?: string;
   created_at: string;
@@ -32,9 +32,15 @@ interface AuthContextType {
   updateUserState: (updatedUserData: Partial<User>) => void;
   refreshUser: () => void;
   updateUserPassword: (userData: any) => Promise<any>;
+  avatarObjectUrl: string | null;
+  loadUserAvatar: (avatarFileURL: string) => Promise<string | null>;
+  deleteAvatar: () => Promise<any>;
+  deleteAccount: (password: string) => Promise<any>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+export const DEFAULT_AVATAR_URL = 'http://localhost:8080/assets/images/user-avatars/default-avatar.png';
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -43,72 +49,74 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
-  useEffect(() => {
-    const accessToken = sessionStorage.getItem('accessToken');
-    if (accessToken) {
-      axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
-    }
+  const [avatarObjectUrl, setAvatarObjectUrl] = useState<string | null>(null);
 
-    const responseInterceptor = axios.interceptors.response.use(
-      (response) => response,
-      async (error) => {
-        const originalRequest = error.config;
-        
-        const isAuthEndpoint = originalRequest.url && (
-          originalRequest.url.includes('/auth/login') ||
-          originalRequest.url.includes('/auth/register') ||
-          originalRequest.url.includes('/login') ||
-          originalRequest.url.includes('/register')
-        );
-        
-        const hasRefreshToken = localStorage.getItem('refreshToken') !== null;
-        
-        if (
-          error.response &&
-          (error.response.status === 401 || error.response.status === 403) &&
-          !originalRequest._retry &&
-          !isAuthEndpoint &&
-          hasRefreshToken
-        ) {
-          originalRequest._retry = true;
-          try {
-            const refreshedTokenData = await authService.refreshToken();
-            if (refreshedTokenData.newRefreshToken) {
-              localStorage.setItem("refreshToken", refreshedTokenData.newRefreshToken);
-            }
-            originalRequest.headers['Authorization'] = `Bearer ${refreshedTokenData.accessToken}`;
-            sessionStorage.setItem('accessToken', refreshedTokenData.accessToken);
-            axios.defaults.headers.common['Authorization'] = `Bearer ${refreshedTokenData.accessToken}`;
-            return axios(originalRequest);
-          } catch (refreshError) {
-            setUser(null);
-            localStorage.removeItem('user');
-            sessionStorage.removeItem('accessToken');
-            localStorage.removeItem('refreshToken');
-            router.push('/login');
-            return Promise.reject(refreshError);
+  // contexts/AuthContext.tsx
+useEffect(() => {
+  const accessToken = sessionStorage.getItem('accessToken');
+  if (accessToken) {
+    axios.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
+  }
+
+  const responseInterceptor = axios.interceptors.response.use(
+    (response) => response,
+    async (error) => {
+      const originalRequest = error.config;
+      
+      const isAuthEndpoint = originalRequest.url && (
+        originalRequest.url.includes('/auth/login') ||
+        originalRequest.url.includes('/auth/register') ||
+        originalRequest.url.includes('/login') ||
+        originalRequest.url.includes('/register')
+      );
+      
+      const hasRefreshToken = localStorage.getItem('refreshToken') !== null;
+      
+      if (
+        error.response &&
+        (error.response.status === 401 || error.response.status === 403) &&
+        !originalRequest._retry &&
+        !isAuthEndpoint &&
+        hasRefreshToken
+      ) {
+        originalRequest._retry = true;
+        try {
+          const refreshedTokenData = await authService.refreshToken();
+          if (refreshedTokenData.newRefreshToken) {
+            localStorage.setItem("refreshToken", refreshedTokenData.newRefreshToken);
           }
+          originalRequest.headers['Authorization'] = `Bearer ${refreshedTokenData.accessToken}`;
+          sessionStorage.setItem('accessToken', refreshedTokenData.accessToken);
+          axios.defaults.headers.common['Authorization'] = `Bearer ${refreshedTokenData.accessToken}`;
+          return axios(originalRequest);
+        } catch (refreshError) {
+          setUser(null);
+          localStorage.removeItem('user');
+          sessionStorage.removeItem('accessToken');
+          localStorage.removeItem('refreshToken');
+          router.push('/login');
+          return Promise.reject(refreshError);
         }
-        return Promise.reject(error);
       }
-    );
-
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      try {
-        setUser(JSON.parse(storedUser));
-      } catch (err) {
-        console.error('Failed to parse user from localStorage', err);
-        localStorage.removeItem('user');
-      } finally {
-        setInitialLoading(false);
-      }
+      return Promise.reject(error);
     }
+  );
 
-    return () => {
-      axios.interceptors.response.eject(responseInterceptor);
-    };
-  }, [router]);
+  const storedUser = localStorage.getItem('user');
+  if (storedUser) {
+    try {
+      setUser(JSON.parse(storedUser));
+    } catch (err) {
+      console.error('Failed to parse user from localStorage', err);
+      localStorage.removeItem('user');
+    }
+  }
+  setInitialLoading(false);
+
+  return () => {
+    axios.interceptors.response.eject(responseInterceptor);
+  };
+}, [router]);
 
 const register = async (firstName: string, lastName: string, email: string, password: string) => {
   try {
@@ -405,16 +413,12 @@ const uploadUserAvatar = async (formData: FormData, userId: string) => {
     try {
       const response = await userService.uploadAvatar(formData, userId);
       
-      if (response.server_filename) {
-        const baseUrl = 'http://localhost:8080/uploads/user-avatars/';
-        const profilePictureUrl = `${baseUrl}${response.server_filename}`;
-        
+      if (response.avatarFileURL) {
         setUser(prevUser => {
           if (!prevUser) return prevUser;
           return { 
             ...prevUser, 
-            profilePictureName: response.server_filename,
-            profilePictureUrl: profilePictureUrl 
+            avatarFileURL: response.avatarFileURL
           };
         });
         
@@ -424,8 +428,7 @@ const uploadUserAvatar = async (formData: FormData, userId: string) => {
             const parsedUser = JSON.parse(storedUser);
             const mergedUser = { 
               ...parsedUser, 
-              profilePictureName: response.server_filename,
-              profilePictureUrl: profilePictureUrl
+              avatarFileURL: response.avatarFileURL 
             };
             localStorage.setItem('user', JSON.stringify(mergedUser));
             
@@ -439,7 +442,7 @@ const uploadUserAvatar = async (formData: FormData, userId: string) => {
           success: true,
           message: 'Avatar successfully uploaded',
           data: response,
-          profilePictureUrl: profilePictureUrl
+          avatarFileURL: response.avatarFileURL
         };
       } else {
         return {
@@ -487,6 +490,103 @@ const refreshUser = () => {
     }
   }
 };
+
+const loadUserAvatar = useCallback(async (avatarFileURL: string) => {
+  if (avatarObjectUrl) {
+    URL.revokeObjectURL(avatarObjectUrl);
+  }
+
+  if (!avatarFileURL || avatarFileURL === DEFAULT_AVATAR_URL) {
+    setAvatarObjectUrl(null);
+    return null;
+  }
+
+  try {
+    const avatarBlob = await userService.fetchUserAvatar(avatarFileURL);
+    const url = URL.createObjectURL(avatarBlob);
+    setAvatarObjectUrl(url);
+    return url;
+  } catch (err) {
+    console.error('Error loading user avatar:', err);
+    setAvatarObjectUrl(null);
+    return null;
+  }
+}, [avatarObjectUrl]);
+
+const deleteAvatar = async () => {
+  try {
+    setLoading(true);
+    setError(null);
+
+    if (!user) {
+      return { error: true, message: 'User not authenticated' };
+    }
+
+    const avatarFileURL = user.avatarFileURL;
+    if (!avatarFileURL) {
+      return { error: true, message: 'No avatar to delete' };
+    }
+    const fileKey = avatarFileURL.substring(avatarFileURL.lastIndexOf('/') + 1);
+
+    const updatedUser = await userService.deleteUserAvatar(user.id, fileKey);
+
+    setUser(updatedUser);
+    localStorage.setItem('user', JSON.stringify(updatedUser));
+
+    if (avatarObjectUrl) {
+      URL.revokeObjectURL(avatarObjectUrl);
+      setAvatarObjectUrl(null);
+    }
+
+    return { success: true, message: 'Avatar successfully deleted', data: updatedUser };
+
+  } catch (err: any) {
+    console.error('Error deleting avatar in AuthContext:', err);
+    const errorMessage = err.response?.data?.message || 'Failed to delete avatar. Please try again.';
+    setError(errorMessage);
+    return { error: true, message: errorMessage, details: err.response?.data };
+  } finally {
+    setLoading(false);
+  }
+};
+
+const deleteAccount = async (password: string) => {
+  try {
+    setLoading(true);
+    setError(null);
+ 
+    if (!user) {
+      return { error: true, message: 'User not authenticated' };
+    }
+ 
+    const response = await userService.deleteUser(user.id, { data: { password } });
+ 
+    setUser(null);
+    localStorage.removeItem('user');
+    sessionStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+    delete axios.defaults.headers.common['Authorization'];
+ 
+    if (avatarObjectUrl) {
+      URL.revokeObjectURL(avatarObjectUrl);
+      setAvatarObjectUrl(null);
+    }
+ 
+    router.push('/login');
+ 
+    return { success: true, message: response.message || 'Account successfully deleted' };
+ 
+  } catch (err: any) {
+    console.error('Error deleting account in AuthContext:', err);
+    const errorMessage = err.response?.data?.message || 'Failed to delete account. Please try again.';
+    setError(errorMessage);
+ 
+    return { error: true, message: errorMessage, details: err.response?.data };
+  } finally {
+    setLoading(false);
+  }
+};
+
   return (
     <AuthContext.Provider value={{ 
       user, 
@@ -504,7 +604,11 @@ const refreshUser = () => {
       uploadUserAvatar,
       updateUserState,
       refreshUser,
-      updateUserPassword
+      updateUserPassword,
+      avatarObjectUrl,
+      loadUserAvatar,
+      deleteAvatar,
+      deleteAccount
     }}>
       {children}
     </AuthContext.Provider>

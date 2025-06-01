@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth, User, DEFAULT_AVATAR_URL } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
 
 interface Template {
@@ -16,7 +16,7 @@ interface Template {
 
 export default function Header() {
   const router = useRouter();
-  const { user, logout, refreshUser } = useAuth();
+  const { user, logout, refreshUser, avatarObjectUrl, loadUserAvatar } = useAuth();
   const { isDarkMode, setTheme } = useTheme();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -27,6 +27,17 @@ export default function Header() {
     router.push(`/templates/${templateId}`);
     setIsMobileMenuOpen(false);
   };
+
+  useEffect(() => {
+    if (user?.avatarFileURL && user.avatarFileURL !== DEFAULT_AVATAR_URL) {
+      loadUserAvatar(user.avatarFileURL);
+    }
+    return () => {
+      if (avatarObjectUrl) {
+        URL.revokeObjectURL(avatarObjectUrl);
+      }
+    };
+  }, [user?.avatarFileURL]);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -118,15 +129,11 @@ export default function Header() {
                   className="flex items-center focus:outline-none group"
                 >
                   <div className="relative h-8 w-8 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-800 text-gray-600 dark:text-gray-300 flex items-center justify-center border border-transparent hover:border-gray-300 dark:hover:border-gray-700 transition-colors">
-                    {user.profilePictureUrl ? (
-                      <img
-                        src={user.profilePictureUrl}
-                        alt={user.firstName}
-                        className="h-full w-full object-cover"
-                      />
-                    ) : (
-                      <span className="text-sm font-medium">{getInitials(user.firstName, user.lastName)}</span>
-                    )}
+                    <img
+                      src={avatarObjectUrl || user?.avatarFileURL || DEFAULT_AVATAR_URL}
+                      alt={`${user.firstName} ${user.lastName}`}
+                      className="h-full w-full object-cover"
+                    />
                   </div>
                   <p className="ml-2 font-medium text-gray-900 dark:text-white text-sm">{user.firstName} {user.lastName}</p>
 
@@ -137,15 +144,11 @@ export default function Header() {
                     <div className="p-4 border-b border-gray-200 dark:border-gray-800">
                       <div className="flex items-center space-x-3">
                         <div className="h-10 w-10 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-800 text-gray-600 dark:text-gray-300 flex items-center justify-center">
-                          {user.profilePictureUrl ? (
-                            <img
-                              src={user.profilePictureUrl}
-                              alt={user.firstName}
-                              className="h-full w-full object-cover"
-                            />
-                          ) : (
-                            <span className="text-sm font-medium">{getInitials(user.firstName, user.lastName)}</span>
-                          )}
+                          <img
+                            src={avatarObjectUrl || user?.avatarFileURL || DEFAULT_AVATAR_URL}
+                            alt={`${user.firstName} ${user.lastName}`}
+                            className="h-full w-full object-cover"
+                          />
                         </div>
                         <div>
                           <div className="flex items-center gap-2">
@@ -250,15 +253,11 @@ export default function Header() {
               <div className="p-4 border-b border-gray-200 dark:border-gray-800">
                 <div className="flex items-center space-x-3">
                   <div className="h-10 w-10 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-800 text-gray-600 dark:text-gray-300 flex items-center justify-center">
-                    {user.profilePictureUrl ? (
-                      <img
-                        src={user.profilePictureUrl}
-                        alt={user.firstName}
-                        className="h-full w-full object-cover"
-                      />
-                    ) : (
-                      <span className="text-sm font-medium">{getInitials(user.firstName, user.lastName)}</span>
-                    )}
+                    <img
+                      src={avatarObjectUrl || user?.avatarFileURL || DEFAULT_AVATAR_URL}
+                      alt={`${user.firstName} ${user.lastName}`}
+                      className="h-full w-full object-cover"
+                    />
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
@@ -284,24 +283,24 @@ export default function Header() {
               {isAuthenticated && (
                 <>
                   <Link
-                    href="/account"
+                    href="/profile"
                     className="block px-3 py-2 font-medium rounded-md text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 text-sm flex items-center"
                     onClick={() => setIsMobileMenuOpen(false)}>
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-gray-500 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                     </svg>
-                    My Account
+                    Profile
                   </Link>
 
                   <Link
-                    href="/templates"
+                    href="/projects"
                     className="block px-3 py-2 rounded-md font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 text-sm flex items-center"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-gray-500 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
                     </svg>
-                    Templates
+                    My Projects
                   </Link>
                 </>
               )}

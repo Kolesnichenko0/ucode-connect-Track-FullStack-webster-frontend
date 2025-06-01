@@ -35,6 +35,35 @@ uploadAvatar: async (formData: FormData, userId: string) => {
     })
     return response.data
 },
+fetchUserAvatar: async (avatarFileURL: string) => {
+    try {
+      const response = await axios.get(avatarFileURL, {
+        responseType: 'blob',
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching avatar from API:', error);
+      throw error;
+    }
+  },
+  deleteUserAvatar: async (userId: string, fileKey: string) => {
+    try {
+      const response = await axios.delete(`${API_URL}/${userId}/avatar/${fileKey}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error deleting avatar from API:', error);
+      throw error;
+    }
+  },
+  deleteUser: async (userId: string, data?: any) => {
+    try {
+      const response = await axios.delete(`${API_URL}/${userId}`, { data });
+      return response.data;
+    } catch (error) {
+      console.error('Error deleting user from API:', error);
+      throw error;
+    }
+  },
 };
 
 export default userService;

@@ -167,16 +167,17 @@ const Tooltip: React.FC<TooltipProps> = ({
       pointerEvents: "none",
       opacity: isVisible ? 1 : 0,
       transition: "opacity 0.2s ease-in-out",
-      backgroundColor: isDarkMode ? "#1f2937" : "#374151",
-      color: "white",
+      backgroundColor: isDarkMode ? "#474747" : "#dbd9d9",
+      color: isDarkMode ? "white" : "black",
       padding: image ? "0 0 8px 0" : "6px 8px",
-      borderRadius: "6px",
+      borderRadius: "8px",
       fontSize: "12px",
       fontWeight: "500",
-      boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
+      boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.6), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
       width: "240px",
       wordWrap: "break-word",
       overflow: "hidden",
+      border: `1px solid ${isDarkMode ? "#1f1f1f" : "#dbd9d9"}`,
     }
 
     switch (actualPosition) {
@@ -269,7 +270,7 @@ const Tooltip: React.FC<TooltipProps> = ({
                 textAlign: "left",
                 lineHeight: "1.2",
                 padding: "0 8px 8px 8px",
-                fontSize: "12px",
+                fontSize: "13px",
                 opacity: 0.9,
               }}
             >

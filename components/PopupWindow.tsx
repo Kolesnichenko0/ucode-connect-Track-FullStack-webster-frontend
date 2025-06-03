@@ -39,6 +39,25 @@ const PopupWindow = ({setIsOpenModal}) => {
         setHeight(h);
     };
 
+    const generateContent = (userId: number) => {
+      const timestamp = Date.now();
+    
+      return {
+        id: `project_${timestamp}_${Math.random().toString(36).substr(2, 8)}`,
+        title: title || 'Untitled',
+        description: description || '',
+        width,
+        height,
+        createdAt: new Date().toISOString(),
+        lastModified: new Date().toISOString(),
+        thumbnailUrl: null,
+        backgroundColor,
+        isTransparent,
+        objects: [],
+        userId
+      };
+    };
+
     return(<>
         <div
             className='popup-backdrop'
@@ -128,6 +147,8 @@ const PopupWindow = ({setIsOpenModal}) => {
             onClick={() => {
               setIsOpenModal(false),
               localStorage.removeItem('canvas-objects'),
+              localStorage.removeItem('canvas-history'),
+              localStorage.removeItem('canvas-history-step'),
               router.push({
                 pathname: '/editor',
                 query: {

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useTheme } from '../contexts/ThemeContext';
 import { CanvasObject } from '../types/CanvasObject';
+import { useHistoryContext } from '../contexts/HistoryContext';
 
 interface GoogleFont {
   family: string;
@@ -23,6 +24,7 @@ interface TextPanelProps {
   activeTool: string | null;
   setActiveTool: (tool: string | null) => void;
   selectedObject?: CanvasObject;
+  objects: CanvasObject[];
   setObjects: React.Dispatch<React.SetStateAction<CanvasObject[]>>;
   onTextSettingsChange?: (settings: any) => void;
 }
@@ -31,6 +33,7 @@ const TextPanel: React.FC<TextPanelProps> = ({
   activeTool,
   setActiveTool,
   selectedObject,
+  objects,
   setObjects,
   onTextSettingsChange
 }) => {
@@ -58,6 +61,7 @@ const TextPanel: React.FC<TextPanelProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [displayedGoogleFonts, setDisplayedGoogleFonts] = useState<GoogleFont[]>([]);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const { addHistoryStep } = useHistoryContext();
 
   const fonts = [
     'Arial',
@@ -239,6 +243,7 @@ const TextPanel: React.FC<TextPanelProps> = ({
           ? { ...obj, [property]: value }
           : obj
       ));
+      addHistoryStep(`Text settings changed`, objects);
     } else {
       setDefaultTextSettings(newSettings);
     }
@@ -248,11 +253,13 @@ const TextPanel: React.FC<TextPanelProps> = ({
     setTextValue(value);
 
     if (selectedObject && selectedObject.type === 'text' && isEditingSelected) {
-      setObjects(prev => prev.map(obj =>
-        obj.id === selectedObject.id
+      const updated = objects.map(obj =>
+        obj.id === selectedObject.id 
           ? { ...obj, text: value }
           : obj
-      ));
+      );
+      setObjects(updated);
+      addHistoryStep(`Text changed`, updated);
     }
   };
 

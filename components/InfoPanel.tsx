@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { HuePicker } from 'react-color';
+import { SketchPicker } from 'react-color';
 
 export default function InfoPanel({settings, setSettings}) {
     const handleChange = (prop: string, value: any) => {
@@ -21,7 +21,17 @@ export default function InfoPanel({settings, setSettings}) {
                 <input id='info-width-input' value={settings.width} onChange={(e) => handleChange('width', Number(e.target.value))} type='number' className='info-input' min='100' max='1200'  placeholder='1080' required></input>
               </div>
             </div>
-                        
+            <div id='status-part'>
+              <label className='info-label'>Status</label>
+              <div className='info-bg-options'>
+                <input
+                  type='checkbox'
+                  checked={settings.isTemplate}
+                  onChange={() => handleChange('isTemplate', !settings.isTemplate)}
+                />
+                <span className='info-bg-text'>Template</span>
+              </div>
+            </div>            
             <div className='info-bg-section'>
               <label className='info-label'>Background</label>
               <div className='info-bg-options'>
@@ -34,7 +44,7 @@ export default function InfoPanel({settings, setSettings}) {
               </div>
               {!settings.isTransparent && (
                 <div className="info-color-picker-wrapper">
-                  <HuePicker
+                  <SketchPicker
                     color={settings.backgroundColor}
                     onChangeComplete={(color) => handleChange('backgroundColor', color.hex)}
                     styles={{

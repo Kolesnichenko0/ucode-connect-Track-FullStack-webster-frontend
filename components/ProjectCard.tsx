@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { formatDate } from '../utils/dateUtils';
+import DownloadPreview from './DownloadModal';
 import '../styles/main.css';
 import projectService from '../services/projectService';
 
 const ProjectCard = ({ project}) => {
-    const [isOpen, setIsOpen] = useState(false);
+    const [isOpenModal, setIsOpenModal] = useState(false);
     const [showActions, setShowActions] = useState(false);
     const router = useRouter();
 
@@ -17,10 +18,6 @@ const ProjectCard = ({ project}) => {
     }
 
     const shareProject = async (id) => {
-      
-    }
-
-    const downloadProject = async (id) => {
       
     }
 
@@ -42,6 +39,9 @@ const ProjectCard = ({ project}) => {
               {project.updatedAt ? new Date(project.createdAt).toLocaleDateString() : formatDate(new Date(), 'MMM dd, yyyy')}
             </span>
           </div>
+          {
+                isOpenModal && <DownloadPreview setIsOpenModal={setIsOpenModal}  projectId={project.id}/>
+          }
           {showActions && (
           <div className='project-actions' onClick={(e) => e.stopPropagation()}>
             <div className='option-block'>
@@ -61,7 +61,7 @@ const ProjectCard = ({ project}) => {
             </div>
             <div className='option-block'>
                 <img className='option' id='download-img' src='/images/download-icon.png' onClick={() => {
-                    downloadProject(project.id);
+                    setIsOpenModal(true);
                 }}></img>
             </div>
           </div>

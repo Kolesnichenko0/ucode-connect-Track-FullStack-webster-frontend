@@ -4,6 +4,8 @@ import { useTheme } from '../contexts/ThemeContext';
 import { CanvasObject } from '../types/CanvasObject';
 import CanvasImage from './CanvasImage';
 import { Stage, Layer, Rect, Text, Transformer, Circle, Star, Line, Arrow } from 'react-konva';
+import { useHistoryContext } from '../contexts/HistoryContext';
+import DownloadModal from './DownloadModal';
 
 type DrawingLineObject = {
   id: string;
@@ -25,6 +27,7 @@ export default function Canvas({ settings, activeTool, setActiveTool, paintTool,
   const trRef = useRef<any>(null);
   const stageRef = useRef<any>(null);
   const { isDarkMode } = useTheme();
+  const { addHistoryStep, undo, redo, history, historyStep } = useHistoryContext();
   const {
     title,
     description,
@@ -49,8 +52,38 @@ export default function Canvas({ settings, activeTool, setActiveTool, paintTool,
   useEffect(() => {
     const saved = localStorage.getItem('canvas-objects');
     if (saved) {
-      setObjects(JSON.parse(saved));
+      const parsed = JSON.parse(saved);
+      setObjects(parsed);
+      history.current = [];
+      history.current.push({
+        objects: parsed,
+        description: 'Initial state',
+      });
+      historyStep.current = 0;
     }
+    else {
+      history.current = [];
+      history.current.push({
+        objects: [],
+        description: 'Initial empty canvas',
+      });
+      historyStep.current = 0;
+    }
+
+    const savedHistory = localStorage.getItem('canvas-history');
+    const savedStep = localStorage.getItem('canvas-history-step');
+
+    if (savedHistory) {
+      history.current = JSON.parse(savedHistory);
+      historyStep.current = savedStep ? parseInt(savedStep) : history.current.length - 1;
+    } else {
+      history.current = [{
+        objects: [],
+        description: 'Initial empty canvas',
+      }];
+      historyStep.current = 0;
+    }
+
     setHasLoaded(true);
   }, []);
 
@@ -69,6 +102,7 @@ export default function Canvas({ settings, activeTool, setActiveTool, paintTool,
     objectsCopy.splice(index, 1);
     objectsCopy.push(obj);
     setObjects(objectsCopy);
+    addHistoryStep('Moved object' , objectsCopy);
   }
 
   const handleDragEnd = (id, e) => {
@@ -101,9 +135,10 @@ export default function Canvas({ settings, activeTool, setActiveTool, paintTool,
     node.scaleX(1);
     node.scaleY(1);
     setObjects(updated);
+    addHistoryStep('Transformed object' , updated);
   };
 
-  const handleExportImg = (format) => {
+  const handleExportImg = (format, title) => {
     const mimeType = format === 'jpg' ? 'image/jpeg' : `image/${format}`;
     const uri = stageRef.current.toDataURL({mimeType, quality: 1});
     const link = document.createElement('a');
@@ -112,7 +147,7 @@ export default function Canvas({ settings, activeTool, setActiveTool, paintTool,
     link.click();
   };
 
-  const handleExportPDF = () => {
+  const handleExportPDF = (title) => {
     const imgData = stageRef.current.toDataURL({mimeType: 'image/jpeg', quality: 1});
     const pdf = new jsPDF({
       orientation: 'landscape',
@@ -149,7 +184,9 @@ export default function Canvas({ settings, activeTool, setActiveTool, paintTool,
         y: pointerPosition.y,
         src,
       };
-      setObjects(prev => [...prev, newImage]);
+      const newObjects = [...objects, newImage];
+      setObjects(newObjects);
+      addHistoryStep(`Added image`, newObjects);
     }
   }
 
@@ -184,11 +221,13 @@ export default function Canvas({ settings, activeTool, setActiveTool, paintTool,
             fill: 'black',
           };
         }
-  
-        setObjects(prev => [...prev, newShape]);
+
+        const newObjects = [...objects, newShape];
+        setObjects(newObjects);
+        addHistoryStep(`Added ${activeTool}`, newObjects);
         setActiveTool(null);
       }
-      else if (paintTool === 'brush' || paintTool === 'eraser') {
+      else if ((paintTool === 'brush' || paintTool === 'eraser') && selectedId === null) {
         const stage = stageRef.current;
         const point = stage.getPointerPosition();
 
@@ -198,17 +237,15 @@ export default function Canvas({ settings, activeTool, setActiveTool, paintTool,
           points: [point.x, point.y],
           stroke: paintTool === 'eraser' ? 'white' : paintSettings.fill || '#000',
           strokeWidth: paintSettings.strokeWidth || 5,
-          opacity: paintSettings.opacity ?? 1,
+          opacity: paintTool === 'eraser' ? 1 : paintSettings.opacity,
           globalCompositeOperation: paintTool === 'eraser' ? 'destination-out' : 'source-over',
         }
 
         setIsDrawing(true);
         setCurrentLine(newLine);
       }
-      else {
-        if( e.target === e.target.getStage()) {
-          setSelectedId(null);
-        }
+      if( e.target === e.target.getStage()) {
+        setSelectedId(null);
       }
   };
 
@@ -224,7 +261,9 @@ export default function Canvas({ settings, activeTool, setActiveTool, paintTool,
 
   const handleMouseUp = () => {
     if (isDrawing && currentLine) {
-      setObjects(prev => [...prev, currentLine]);
+      const newObjects = [...objects, currentLine];
+      setObjects(newObjects);
+      addHistoryStep(`${paintTool === 'brush' ? 'Painted with brush' : 'Eraser used'}`, newObjects);
       setCurrentLine(null);
       setIsDrawing(false);
     }
@@ -233,8 +272,8 @@ export default function Canvas({ settings, activeTool, setActiveTool, paintTool,
   const handleKeyDown = (e: KeyboardEvent) => {
     if (e.key === 'Delete' && selectedId) {
       const newObjects = objects.filter((o) => o.id !== selectedId);
-      setObjects(newObjects);
       setSelectedId(null);
+      addHistoryStep('Deleted object', newObjects);
     }
 
     if (selectedId && ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
@@ -242,11 +281,11 @@ export default function Canvas({ settings, activeTool, setActiveTool, paintTool,
 
       const moveDistance = e.shiftKey ? 10 : 1;
 
-      setObjects(prev => prev.map(obj => {
+      const updatedObjects = objects.map(obj => {
         if (obj.id === selectedId) {
           let newX = obj.x;
           let newY = obj.y;
-
+      
           switch (e.key) {
             case 'ArrowUp':
               newY = Math.max(0, obj.y - moveDistance);
@@ -261,11 +300,14 @@ export default function Canvas({ settings, activeTool, setActiveTool, paintTool,
               newX = Math.min(width - (obj.width || 0), obj.x + moveDistance);
               break;
           }
-
+      
           return { ...obj, x: newX, y: newY };
         }
         return obj;
-      }));
+      });
+      
+      setObjects(updatedObjects);
+      addHistoryStep('Moved with arrow keys', updatedObjects);
     }
   }
 
@@ -278,16 +320,30 @@ export default function Canvas({ settings, activeTool, setActiveTool, paintTool,
     localStorage.setItem('canvas-objects', JSON.stringify(objects));
   }
 
+  const shareToFacebook = () => {
+    const imageUrl = stageRef.current.toDataURL({mimeType: 'image/jpeg', quality: 1});
+    const pageUrl = `http://localhost:5173/share?title=${encodeURIComponent(title)}&description=${encodeURIComponent(description)}`;
+    const shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(pageUrl)}`;
+    window.open(shareUrl, '_blank');
+  };
+
   useEffect(() => {
     if (hasLoaded) {
       localStorage.setItem('canvas-objects', JSON.stringify(objects));
     }
   }, [objects, hasLoaded]);
 
+  useEffect(() => {
+    if (hasLoaded) {
+      localStorage.setItem('canvas-history', JSON.stringify(history.current));
+      localStorage.setItem('canvas-history-step', String(historyStep.current));
+    }
+  }, [history.current, historyStep.current, hasLoaded]);
+
   return (<>
     <div className='toolbar'>
-        <button><img id='undo-icon' src={`/images/editor/undo-icon${isDarkMode? '_white': ''}.png`}alt='Undo' /></button>
-        <button><img id='redo-icon' src={`/images/editor/redo-icon${isDarkMode? '_white': ''}.png`} alt='Redo' /></button>
+        <button onClick={() => {undo(setObjects)}}><img id='undo-icon' src={`/images/editor/undo-icon${isDarkMode? '_white': ''}.png`}alt='Undo' /></button>
+        <button onClick={() => {redo(setObjects)}}><img id='redo-icon' src={`/images/editor/redo-icon${isDarkMode? '_white': ''}.png`} alt='Redo' /></button>
         <div className="zoom-controls">
           <button onClick={zoomOut}>
           <img id='zoom-in-icon' src={`/images/editor/zoom-out${isDarkMode ? '_white' : ''}.png`} alt="Zoom out" />
@@ -314,19 +370,16 @@ export default function Canvas({ settings, activeTool, setActiveTool, paintTool,
         <button className='save' onClick={handleSave}>
           <img id='save-icon' src={`/images/editor/save${isDarkMode? '_white': ''}.png`} alt='Save' />
         </button>
+        <button className='save' onClick={shareToFacebook}>
+          <img id='share-icon' src={`/images/editor/share${isDarkMode? '_white': ''}.png`} alt='Share' />
+        </button>
         <div className='dropdown'>
           <button onClick={() => setShowFormats(!showFormats)}>
             <img id='download-icon' src={`/images/editor/download${isDarkMode? '_white': ''}.png`} alt='Download' />
           </button>
-        
-          { showFormats && <>
-            <div className='dropdown-menu sort-dropdown'>
-                <div className='dropdown-option' onClick={() => handleExportImg('png')}><img src='https://static.thenounproject.com/png/11204-200.png' alt=''/>PNG</div>
-                <div className='dropdown-option' onClick={() => handleExportImg('jpg')}><img src='https://static.thenounproject.com/png/11204-200.png' alt=''/>JPG</div>
-                <div className='dropdown-option' onClick={() => handleExportImg('webp')}><img src='https://static.thenounproject.com/png/11204-200.png' alt=''/>WEBP</div>
-                <div className='dropdown-option' onClick={() => handleExportPDF()}><img  src='/images/editor/document.png' alt=''/>PDF</div>
-            </div>
-          </>}
+        {
+          showFormats && <DownloadModal setIsOpenModal={setShowFormats} handleExportImg={handleExportImg} handleExportPDF={handleExportPDF} projectTitle={title}/>
+        }
         </div>
     </div>
     <div className='canvas' 
@@ -405,7 +458,7 @@ export default function Canvas({ settings, activeTool, setActiveTool, paintTool,
                 />
               );
             } else if (obj.type === 'line') {
-              return <Line key={obj.id} points={[0, 0, obj.width, obj.height]} stroke="black" {...commonProps} />;
+              return <Line key={obj.id} points={[0, 0, obj.width, obj.height]} lineCap="round" lineJoin="round" stroke="black" {...commonProps} />;
             } else if (obj.type === 'arrow') {
               return <Arrow key={obj.id} points={[0, 0, obj.width, obj.height]} fill="black" stroke="black" {...commonProps} />;
             } else if (obj.type === 'curve-line') {

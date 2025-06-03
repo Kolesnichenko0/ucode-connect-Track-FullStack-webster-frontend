@@ -223,3 +223,63 @@
       transform: translateY(8px);
     }
   }
+
+  @media (max-width: 1280px) {
+    .slogan {
+      flex-direction: column;
+      gap: 40px;
+      text-align: center;
+    }
+  
+    .slogan-text {
+      margin-top: 0;
+      align-self: center;
+      max-width: 100%;
+    }
+  
+    .slogan-image {
+      max-width: 300px;
+      width: 100%;
+      margin: 0 auto;
+    }
+  
+    .page .btn {
+      position: static;
+      margin-top: 40px;
+    }
+  
+    .team-member.frontend,
+    .team-member.backend {
+      margin: 0;
+    }
+  
+    .page .flex {
+      justify-content: center;
+    }
+  
+    .audience-grid {
+      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    }
+  
+    .audience-item p.bottom-sphere {
+      margin-top: 0;
+    }
+  
+    .sphere.bottom-sphere {
+      margin-top: 30px;
+    }
+  
+    .page h2 {
+      font-size: 2rem;
+    }
+  }
+  
+  @media (max-width: 550px) {
+    .main-info {
+      font-size: 14px;
+    }
+
+    .slogan-text h2 {
+      font-size: 25px !important;
+    }
+  }

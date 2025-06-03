@@ -1,14 +1,17 @@
 import React, { useState } from 'react';
-import { useRouter } from 'next/router';
+import { useHistoryContext } from '../contexts/HistoryContext';
 
-export default function ElementsPanel({ activeTool, setActiveTool, selectedObject, setObjects }) {
+export default function ElementsPanel({ activeTool, setActiveTool, selectedObject, objects, setObjects }) {
     const types = ['rect', 'circle', 'star', 'triangle', 'line', 'curve-line', 'arrow'];
     const typesWithoutLines = ['rect', 'circle', 'star', 'triangle', 'arrow'];
+    const { addHistoryStep } = useHistoryContext();
 
     const handleChange = (prop: string, value: any) => {
-        setObjects((prev) =>
-            prev.map(obj => obj.id === selectedObject.id ? { ...obj, [prop]: value  } : obj)
-        );
+        const updated = objects.map(obj =>
+            obj.id === selectedObject.id ? { ...obj, [prop]: value } : obj
+          );
+        setObjects(updated);
+        addHistoryStep(`${selectedObject.type === 'rect' ? 'Rectangle' : selectedObject.type.charAt(0).toUpperCase() + selectedObject.type.slice(1).toLowerCase()} ${prop} changed`, updated);
     };
 
     return(<div className='elements-panel'>

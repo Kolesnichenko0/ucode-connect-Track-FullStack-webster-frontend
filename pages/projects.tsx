@@ -1,4 +1,5 @@
 import '../styles/projects.css';
+import { Scrollbar } from 'react-scrollbars-custom';
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import projectService from '../services/projectService';
@@ -52,71 +53,83 @@ export default function MyProjects() {
             {
                 isOpenModal && <PopupWindow setIsOpenModal={setIsOpenModal}/>
             }
-            <motion.h2
+            
+            <div className="projects-wrapper">
+                <motion.h2
+                    initial={{ opacity: 0, y: 50 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.8, delay: 0 }}className='section-title'>
+                        Templates
+                </motion.h2>
+                
+                <Scrollbar className='tmp-scroll' style={{ height: 300, width: 1365, margin: 'auto', marginTop: 40 }} noScrollX>
+                    <motion.div
+                    initial={{ opacity: 0, y: 50 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.8, delay: 0.2 }} 
+                    className='tmp-projects-part'>
+                        {/*
+                            projects.map((project) => (*/
+                            <>
+                            
+                                <ProjectCard key={122} project={project}/>
+                                <ProjectCard key={123} project={project}/>
+                                <ProjectCard key={132} project={project}/>
+                                <ProjectCard key={112} project={project}/>
+                                <ProjectCard key={121} project={project}/>
+                            </>
+                        /* ))
+                        */} 
+                    </motion.div>
+                </Scrollbar>
+
+                <motion.h2 
                 initial={{ opacity: 0, y: 50 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0 }}className='section-title'>
-                    Templates
-            </motion.h2>
-            <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }} 
-            className='tmp-projects-part'>
-                
-                {/*
-                    projects.map((project) => (*/
-                    <>
+                transition={{ duration: 0.8, delay: 0.4 }}
+                className='section-title'
+                id='projects-title'>
+                    Your projects
+                </motion.h2>   
+                <Scrollbar className='projects-scroll' style={{ height: 540, width: 1365, margin: 'auto', marginTop: 40 }} noScrollX>
+                    <motion.div 
+                    initial={{ opacity: 0, y: 50 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.8, delay: 0.6 }}
+                    className='all-projects-part'>  
+                        
+                            <>
+                            <ProjectCard key={1422} project={project}/>
+                            <ProjectCard key={1243} project={project}/>
+                            <ProjectCard key={1342} project={project}/>
+                            <ProjectCard key={1412} project={project}/>
+                            <ProjectCard key={1421} project={project}/>
+                            <ProjectCard key={1112} project={project}/>
+                        </>
+                        
+                    </motion.div>
+                </Scrollbar>
+                <motion.h2 
+                initial={{ opacity: 0, y: 50 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.8 }}
+                className='section-title'
+                id='recent-pr-title'>
+                    Recent projects
+                </motion.h2>    
+                <motion.div 
+                initial={{ opacity: 0, y: 50 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.9 }}
+                className='recent-projects-part'>
                     
-                        <ProjectCard key={122} project={project}/>
-                        <ProjectCard key={123} project={project}/>
-                        <ProjectCard key={132} project={project}/>
-                        <ProjectCard key={112} project={project}/>
-                        <ProjectCard key={121} project={project}/>
+                    <>        
+                        <ProjectCard key={1422} project={project}/>
+                        <ProjectCard key={1243} project={project}/>
+                        <ProjectCard key={1342} project={project}/>
                     </>
-                   /* ))
-                */}
-            </motion.div>
-            <motion.h2 
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-            className='section-title'>
-                Your projects
-            </motion.h2>
-            <motion.div 
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.6 }}
-            className='all-projects-part'>  
-                <>
-                    <ProjectCard key={1422} project={project}/>
-                    <ProjectCard key={1243} project={project}/>
-                    <ProjectCard key={1342} project={project}/>
-                    <ProjectCard key={1412} project={project}/>
-                    <ProjectCard key={1421} project={project}/>
-                    <ProjectCard key={1112} project={project}/>
-                </>
-            </motion.div>
-            <motion.h2 
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.8 }}
-            className='section-title'>
-                Recent projects
-            </motion.h2>
-            <motion.div 
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.9 }}
-            className='recent-projects-part'>
-                
-                <>        
-                    <ProjectCard key={1422} project={project}/>
-                    <ProjectCard key={1243} project={project}/>
-                    <ProjectCard key={1342} project={project}/>
-                </>
-            </motion.div>
+                </motion.div>
+            </div>
         </div>
     </div>
     </>);

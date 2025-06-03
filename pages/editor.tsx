@@ -11,6 +11,8 @@ import { CanvasObject } from '../types/CanvasObject';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 const Canvas = dynamic(() => import('../components/Canvas'), { ssr: false });
+import { HistoryProvider } from '../contexts/HistoryContext';
+import RightPanel from '../components/RightPanel';
 
 export default function EditorPage() {
   const [isOpenLeft, setIsOpenLeft] = useState(false);
@@ -34,6 +36,7 @@ export default function EditorPage() {
     description: '',
     width: 900,
     height: 600,
+    isTemplate: false,
     isTransparent: true,
     backgroundColor: '#dedede',
   });
@@ -55,6 +58,7 @@ export default function EditorPage() {
         description: String(router.query.description),
         width: Number(router.query.width),
         height: Number(router.query.height),
+        isTemplate: false,
         isTransparent: router.query.isTransparent === 'true',
         backgroundColor: String(router.query.backgroundColor),
       });
@@ -95,32 +99,36 @@ export default function EditorPage() {
       if (el) {
         el.classList.add('active-tab');
       }
+
+      if (activeLeftTab !== 'paint') {
+        setPaintTool(null);
+      }
     }
   }, [activeLeftTab]);
 
-  return (<>
+  return (<HistoryProvider>
     <div className='wrapper'>
       <div className='sidebar'>
         <div className='menu'>
-          <Tooltip title="Test" description="Description test" image={`/images/tooltip/lasso-info.png`}>
+          <Tooltip title="Project information" description="📋 Customize the project: from the name to every detail." image={`/images/tooltip/edit-info-panel.png`}>
             <button id='edit-info-btn'><img id='edit-info-icon' src={`/images/editor/edit-info${isDarkMode? '_white': ''}.png`} alt='Edit Info' onClick={() => {handleLeftTabClick('edit-info')}}/></button>
           </Tooltip>
-          <Tooltip title="Test" description="Description test" image={`/images/tooltip/lasso-info.png`}>
+          <Tooltip title="Elements" description="★ Create a composition of the desired elements." image={`/images/tooltip/figures-panel.jpg`}>
             <button id='elements-btn'><img id='elements-icon' src={`/images/editor/elements${isDarkMode? '_white': ''}.png`} alt='Elements' onClick={() => {handleLeftTabClick('elements')}}/></button>
           </Tooltip>
-          <Tooltip title="Test" description="Description test" image={`/images/tooltip/lasso-info.png`}>
+          <Tooltip title="Text" description="📝 Add headers, descriptions or secret messages." image={`/images/tooltip/text-panel.png`}>
             <button id='text-btn'><img id='text-icon' src={`/images/editor/text${isDarkMode? '_white': ''}.png`} alt='Text' onClick={() => {handleLeftTabClick('text')}}/></button>
           </Tooltip>
-          <Tooltip title="Test" description="Description test" image={`/images/tooltip/lasso-info.png`}>
+          <Tooltip title="Images" description="📸 Find the perfect images or add your own." image={`/images/tooltip/images-panel.png`}>
             <button id='images-btn'><img id='images-icon' src={`/images/editor/images${isDarkMode? '_white': ''}.png`} alt='Images' onClick={() => {handleLeftTabClick('images')}}/></button>
           </Tooltip>
-          <Tooltip title="Test" description="Description test" image={`/images/tooltip/lasso-info.png`}>
+          <Tooltip title="Image settings" description="🎨 Adjust the appearance: brightness, contrast and filters!" image={`/images/tooltip/edit-img-panel.png`}>
             <button id='edit-img-btn'><img id='edit-img-icon' src={`/images/editor/edit-img${isDarkMode? '_white': ''}.png`} alt='Edit image' onClick={() => {handleLeftTabClick('edit-img')}}/></button>
           </Tooltip>
-          <Tooltip title="Test" description="Description test" image={`/images/tooltip/lasso-info.png`}>
+          <Tooltip title="Paint" description="🖌️ Draw, erase, experiment!" image={`/images/tooltip/paint-panel.png`}>
             <button id='paint-btn'><img id='paint-icon' src={`/images/editor/paint${isDarkMode? '_white': ''}.png`} alt='Paint' onClick={() => {handleLeftTabClick('paint')}}/></button>
           </Tooltip>
-          <Tooltip title="Test" description="Description test" image={`/images/tooltip/lasso-info.png`}>
+          <Tooltip title="Instruction" description="📖 Don't know where to start? Everything is explained here!" image={`/images/tooltip/instruction-panel.png`}>
             <button id='instruction-btn'><img id='instruction-icon' src={`/images/editor/instruction${isDarkMode? '_white': ''}.png`} alt='Instruction' onClick={() => {handleLeftTabClick('instruction')}}/></button>
           </Tooltip>
         </div>
@@ -131,13 +139,14 @@ export default function EditorPage() {
           <InfoPanel settings={settings} setSettings={setSettings}/>
         }
         {activeLeftTab === 'elements' &&
-          <ElementsPanel activeTool={activeTool} setActiveTool={setActiveTool} selectedObject={objects.find(obj => obj.id === selectedId)} setObjects={setObjects}/>
+          <ElementsPanel activeTool={activeTool} setActiveTool={setActiveTool} selectedObject={objects.find(obj => obj.id === selectedId)} objects={objects} setObjects={setObjects}/>
         }
         {activeLeftTab === 'text' &&
           <TextPanel
             activeTool={activeTool}
             setActiveTool={setActiveTool}
             selectedObject={objects.find(obj => obj.id === selectedId)}
+            objects={objects}
             setObjects={setObjects}
             onTextSettingsChange={setTextSettings}
           />
@@ -169,10 +178,7 @@ export default function EditorPage() {
       </main>
      
       { isOpenRight &&
-        <div className='right-panel'>
-          <h2>Layers</h2>
-          <button className="rp-close-btn right-panel-toggle" onClick={() => setIsOpenRight(false)}>{'>'}</button>
-        </div>
+        <RightPanel setIsOpenRight={setIsOpenRight}/>
       }
       {!isOpenRight && (
         <div className="right-panel-toggle" onClick={() => setIsOpenRight(true)}>
@@ -181,7 +187,7 @@ export default function EditorPage() {
       )}
       
     </div>
-  </>);
+  </HistoryProvider>);
 }
 
 EditorPage.hideFooter = true;

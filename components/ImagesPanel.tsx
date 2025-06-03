@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/router';
+import axios from 'axios';
 
 export default function ImagesPanel() {
     const router = useRouter();
@@ -11,9 +12,21 @@ export default function ImagesPanel() {
         setSearchedTitle(e.target.value);
     };
 
-    const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = e.target.files;
         if (!files) return;
+
+        /*const uploaded = await Promise.all(
+            Array.from(files).map(async (file) => {
+              const formData = new FormData();
+              formData.append('file', file);
+        
+              const res = await axios.post('/api/upload', formData);
+              return `${res.data.fileKey}`;
+            })
+        );
+        
+        setUploadedImages((prev) => [...prev, ...uploaded]);*/
 
         const newImages = Array.from(files).map(file => URL.createObjectURL(file));
         setUploadedImages(prev => [...prev, ...newImages]);

@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
-import { SketchPicker } from 'react-color';
+import { SketchPicker, TwitterPicker } from 'react-color';
+import ToggleButton from 'react-toggle-button';
 
 export default function InfoPanel({settings, setSettings}) {
+    const [width, setWidth] = useState(settings.width);
+    const [height, setHeight] = useState(settings.height);
+
     const handleChange = (prop: string, value: any) => {
         setSettings((prev) => ({ ...prev, [prop]: value }));
     }
@@ -14,11 +18,11 @@ export default function InfoPanel({settings, setSettings}) {
             <div className='info-size-settings'>
               <div>
                 <label className='info-label'>Height (in px)</label>
-                <input id='info-height-input' value={settings.height} onChange={(e) => handleChange('height', Number(e.target.value))} type='number' className='info-input' min='100' max='1080' placeholder='1080' required></input>
+                <input id='info-height-input' value={height} onChange={(e) => setHeight(e.target.value)} onBlur={(e) => handleChange('height', Number(height))} type='number' className='info-input' min='100' max='1080' placeholder='1080' required></input>
               </div>
               <div>
                 <label id='info-width-label' className='info-label info-wh-input'>Width (in px)</label>
-                <input id='info-width-input' value={settings.width} onChange={(e) => handleChange('width', Number(e.target.value))} type='number' className='info-input' min='100' max='1200'  placeholder='1080' required></input>
+                <input id='info-width-input' value={width} onChange={(e) => setWidth(e.target.value)} onBlur={(e) => handleChange('width', Number(width))} type='number' className='info-input' min='100' max='1200'  placeholder='1080' required></input>
               </div>
             </div>
             <div id='status-part'>
@@ -31,7 +35,33 @@ export default function InfoPanel({settings, setSettings}) {
                 />
                 <span className='info-bg-text'>Template</span>
               </div>
-            </div>            
+            </div>    
+            <div id='grid-part'>
+            <div className='grid-toggle'>
+              <label className='info-label grid-label'>Grid</label>
+              <ToggleButton
+                value={ settings.showGrid }
+                onToggle={() => handleChange('showGrid', !settings.showGrid)}
+              />
+            </div>
+            { settings.showGrid &&
+            
+              <TwitterPicker 
+                color={settings.gridColor}
+                onChangeComplete={(color) => handleChange('gridColor', color.hex)}
+                styles={{
+                  default: {
+                    picker: {
+                      width: '80px',
+                      boxSizing: 'border-box',
+                      height: '20px',
+                    }
+                  }
+                }}
+              />
+         
+            }
+            </div>        
             <div className='info-bg-section'>
               <label className='info-label'>Background</label>
               <div className='info-bg-options'>

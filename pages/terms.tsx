@@ -1,12 +1,15 @@
 import React from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
+import { useTheme } from '../contexts/ThemeContext';
 
 const TermsOfServicePage = () => {
+  const { isDarkMode } = useTheme();
+
   return (
     <div className="bg-white dark:bg-gray-900 min-h-screen">
       
-      <header className="bg-black dark:bg-white">
+      <header style={{ backgroundColor: isDarkMode ? '#0462c6' : '#75b7ff' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="relative z-10">
             <motion.div
@@ -15,7 +18,7 @@ const TermsOfServicePage = () => {
               transition={{ duration: 0.5 }}
             >
               <h1 className="text-3xl md:text-4xl font-bold text-white dark:text-black">Terms of Service</h1>
-              <p className="mt-4 text-gray-400 dark:text-gray-600 text-lg max-w-3xl">
+              <p className="mt-4 text-gray-100 dark:text-gray-900 text-lg max-w-3xl">
                 Please read these terms of service carefully before using our platform. 
                 These terms govern your access to and use of our services.
               </p>
@@ -158,9 +161,7 @@ const TermsOfServicePage = () => {
                 If you have any questions about these Terms, please contact us:
               </p>
               <ul>
-                <li>By email: legal@eventcompany.com</li>
-                <li>By phone: +1 (555) 123-4567</li>
-                <li>By mail: 123 Event Ave, Suite 200, San Francisco, CA 94107</li>
+                <li>By email: myprojects.kde.dev@gmail.com</li>
               </ul>
             </div>
           </div>
@@ -172,7 +173,8 @@ const TermsOfServicePage = () => {
             <motion.div
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="inline-flex items-center px-5 py-3 rounded-xl bg-black dark:bg-white text-white dark:text-black text-sm font-medium hover:from-emerald-600 hover:to-teal-600 transition-all shadow-md"
+              style={{ backgroundColor: isDarkMode ? '#0462c6' : '#75b7ff' }}
+              className="inline-flex items-center px-5 py-3 rounded-xl text-white dark:text-black text-sm font-medium hover:from-emerald-600 hover:to-teal-600 transition-all shadow-md"
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />

@@ -3,9 +3,12 @@ import jsPDF from 'jspdf';
 import { useTheme } from '../contexts/ThemeContext';
 import { CanvasObject } from '../types/CanvasObject';
 import CanvasImage from './CanvasImage';
-import { Stage, Layer, Rect, Text, Transformer, Circle, Star, Line, Arrow } from 'react-konva';
+import { Stage, Layer, Rect, Text, Transformer, Circle, Star, Line, Arrow, Group } from 'react-konva';
 import { useHistoryContext } from '../contexts/HistoryContext';
 import DownloadModal from './DownloadModal';
+import Konva from 'konva';
+import Scrollbar from 'react-scrollbars-custom';
+import projectService from '../services/projectService';
 
 type DrawingLineObject = {
   id: string;
@@ -28,13 +31,18 @@ export default function Canvas({ settings, activeTool, setActiveTool, paintTool,
   const stageRef = useRef<any>(null);
   const { isDarkMode } = useTheme();
   const { addHistoryStep, undo, redo, history, historyStep } = useHistoryContext();
+  const imageRefs = useRef<Record<string, Konva.Image | null>>({});
   const {
+    id,
     title,
     description,
     width,
     height,
     isTransparent,
-    backgroundColor
+    backgroundColor,
+    type,
+    showGrid,
+    gridColor,
   } = settings;
 
   const shapeMap = {
@@ -48,6 +56,8 @@ export default function Canvas({ settings, activeTool, setActiveTool, paintTool,
     'curve-line': 'curve-line',
     text: 'text',
   };
+
+  const gridSize = 30;
 
   useEffect(() => {
     const saved = localStorage.getItem('canvas-objects');
@@ -95,19 +105,41 @@ export default function Canvas({ settings, activeTool, setActiveTool, paintTool,
   }, [selectedId, objects]);
 
   const handleDragStart = (id, e) => {
-    const objectsCopy = objects.slice();
-    const obj = objectsCopy.find((i) => i.id === id);
-    if (!obj) return;
-    const index = objectsCopy.indexOf(obj);
-    objectsCopy.splice(index, 1);
-    objectsCopy.push(obj);
+    const baseId = id.replace('-rect', '');
+
+    const textObj = objects.find((obj) => obj.id === baseId);
+    const rectObj = objects.find((obj) => obj.id === `${baseId}-rect`);
+
+    if (!textObj || !rectObj) return;
+
+    const objectsCopy = objects.filter(
+      (obj) => obj.id !== baseId && obj.id !== `${baseId}-rect`
+    );
+
+    objectsCopy.push(rectObj, textObj);
     setObjects(objectsCopy);
     addHistoryStep('Moved object' , objectsCopy);
   }
 
+  const handleDragMove = (id: string, e: any) => {
+    const baseId = id.replace('-rect', '');
+  
+    const newX = e.target.x();
+    const newY = e.target.y();
+  
+    const updated = objects.map(obj => {
+      if (obj.id === baseId || obj.id === `${baseId}-rect`) {
+        return { ...obj, x: newX, y: newY };
+      }
+      return obj;
+    });
+  
+    setObjects(updated);
+  };
+
   const handleDragEnd = (id, e) => {
     const updated = objects.map(obj =>
-      obj.id === id ? { ...obj, x: e.target.x(), y: e.target.y() } : obj
+      obj.id === id || obj.id === `${id}-rect` ? { ...obj, x: e.target.x(), y: e.target.y() } : obj
     );
     setObjects(updated);
   };
@@ -118,27 +150,89 @@ export default function Canvas({ settings, activeTool, setActiveTool, paintTool,
     }
   };
 
-  const handleTransformEnd = (id, e) => {
+  const handleTransform = (id, e) => {
     const node = shapeRefs.current[id];
+  
+    const newWidth = node.width() * node.scaleX();
+    const newHeight = node.height() * node.scaleY();
+    const newX = node.x();
+    const newY = node.y();
+  
     const updated = objects.map(obj => {
-      if (obj.id === id) {
+      if (obj.id === id || obj.id === `${id}-rect`) {
         return {
           ...obj,
-          x: node.x(),
-          y: node.y(),
-          width: node.width() * node.scaleX(),
-          height: node.height() * node.scaleY(),
+          x: newX,
+          y: newY,
+          width: newWidth,
+          height: newHeight,
         };
       }
       return obj;
     });
-    node.scaleX(1);
-    node.scaleY(1);
+  
     setObjects(updated);
-    addHistoryStep('Transformed object' , updated);
   };
 
-  const handleExportImg = (format, title) => {
+  const handleTransformEnd = (id, e) => {
+    const node = shapeRefs.current[id];
+
+    const newWidth = node.width() * node.scaleX();
+    const newHeight = node.height() * node.scaleY();
+
+    const newX = node.x();
+    const newY = node.y();
+
+    /*
+     
+    const updated = objects.map(obj => {
+      if (obj.id === id) {
+        if (obj.type === 'image') {
+          return {
+            ...obj,
+            x: newX,
+            y: newY,
+            width: newWidth,
+            height: newHeight,
+            scaleX: node.scaleX(),
+            scaleY: node.scaleY(),
+          };
+        } else {
+        return {
+          ...obj,
+          x: newX,
+          y: newY,
+          width: newWidth,
+          height: newHeight,
+          scaleX: 1,
+          scaleY: 1,
+        };
+      }
+      }
+      return obj;
+    });*/
+
+    node.scaleX(1);
+    node.scaleY(1);
+
+   const updated = objects.map(obj => {
+      if (obj.id === id || obj.id === `${id}-rect`) {
+        return {
+          ...obj,
+          x: newX,
+          y: newY,
+          width: newWidth,
+          height: newHeight,
+        };
+      }
+      return obj;
+    });
+    
+    setObjects(updated);
+    addHistoryStep('Transformed object' , updated/*objects*/);
+  };
+
+  const handleExportImg = (format) => {
     const mimeType = format === 'jpg' ? 'image/jpeg' : `image/${format}`;
     const uri = stageRef.current.toDataURL({mimeType, quality: 1});
     const link = document.createElement('a');
@@ -147,7 +241,7 @@ export default function Canvas({ settings, activeTool, setActiveTool, paintTool,
     link.click();
   };
 
-  const handleExportPDF = (title) => {
+  const handleExportPDF = () => {
     const imgData = stageRef.current.toDataURL({mimeType: 'image/jpeg', quality: 1});
     const pdf = new jsPDF({
       orientation: 'landscape',
@@ -176,18 +270,49 @@ export default function Canvas({ settings, activeTool, setActiveTool, paintTool,
     const stage = stageRef.current;
     const pointerPosition = stage.getPointerPosition();
     const src = e.dataTransfer.getData('image-src');
+
     if (src) {
-      const newImage: CanvasObject = {
-        id: `img-${Date.now()}`,
-        type: 'image',
-        x: pointerPosition.x,
-        y: pointerPosition.y,
-        src,
+      const img = new (window as any).Image();
+      img.src = src;
+  
+      img.onload = () => {
+        const newImage: CanvasObject = { 
+          id: `img-${Date.now()}`,
+          type: 'image',
+          x: pointerPosition.x,
+          y: pointerPosition.y,
+          width: img.width,    
+          height: img.height,
+          src,
+          brightness: 0,
+          contrast: 0,
+          saturation: 0,
+          blurRadius: 0,
+          filters: [],
+        };
+  
+        setObjects((prevObjects) => {
+          const newObjects = [...prevObjects, newImage];
+          addHistoryStep(`Added image`, newObjects);
+          setSelectedId(newImage.id); 
+          return newObjects;
+        });
       };
-      const newObjects = [...objects, newImage];
-      setObjects(newObjects);
-      addHistoryStep(`Added image`, newObjects);
+  
+      img.onerror = (err) => {
+        console.error("Unable to load dragged image:", err);
+      };
     }
+  }
+
+  function measureTextWidth(text: string, fontSize: number, fontFamily: string, fontStyle: string = 'normal') {
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d');
+    if (!context) return 0;
+  
+    context.font = `${fontStyle} ${fontSize}px ${fontFamily}`;
+    const metrics = context.measureText(text);
+    return metrics.width;
   }
 
   const handleMouseDown = (e: any) => {
@@ -195,10 +320,15 @@ export default function Canvas({ settings, activeTool, setActiveTool, paintTool,
         const pointerPosition = stageRef.current.getPointerPosition();
   
         let newShape: CanvasObject;
+        let newObjects = [...objects];
 
         if (activeTool === 'text') {
-          newShape = {
-            id: `text-${Date.now()}`,
+          const baseId = `text-${Date.now()}`;
+          const textWidth = measureTextWidth(textSettings?.text, textSettings?.fontSize, textSettings?.fontFamily, textSettings?.fontStyle)/* * textSettings?.fontSize * 0.6*/;
+          const textHeight = textSettings?.fontSize * 1.2;
+
+          const textShape: CanvasObject = {
+            id: baseId,
             type: 'text',
             x: pointerPosition.x,
             y: pointerPosition.y,
@@ -210,6 +340,20 @@ export default function Canvas({ settings, activeTool, setActiveTool, paintTool,
             fontVariant: textSettings?.fontVariant || 'normal',
             textDecoration: textSettings?.textDecoration || 'none',
           };
+
+          const rectShape: CanvasObject = {
+            id: `${baseId}-rect`,
+            type: 'rect',
+            x: pointerPosition.x,
+            y: pointerPosition.y,
+            width: textWidth,
+            height: textHeight,
+            fill: 'transparent',
+            cornerRadius: 4,
+          };
+
+          newObjects.push(rectShape);
+          newObjects.push(textShape);
         } else {
           newShape = {
             id: `shape-${Date.now()}`,
@@ -220,9 +364,10 @@ export default function Canvas({ settings, activeTool, setActiveTool, paintTool,
             height: 100,
             fill: 'black',
           };
+
+          newObjects.push(newShape);
         }
 
-        const newObjects = [...objects, newShape];
         setObjects(newObjects);
         addHistoryStep(`Added ${activeTool}`, newObjects);
         setActiveTool(null);
@@ -270,8 +415,9 @@ export default function Canvas({ settings, activeTool, setActiveTool, paintTool,
   };
 
   const handleKeyDown = (e: KeyboardEvent) => {
-    if (e.key === 'Delete' && selectedId) {
-      const newObjects = objects.filter((o) => o.id !== selectedId);
+    if ((e.key === 'Delete' || e.key === 'Backspace') && selectedId) {
+      const newObjects = objects.filter((o) => o.id !== selectedId && o.id !== `${selectedId}-rect`);
+      setObjects(newObjects);
       setSelectedId(null);
       addHistoryStep('Deleted object', newObjects);
     }
@@ -314,16 +460,43 @@ export default function Canvas({ settings, activeTool, setActiveTool, paintTool,
   useEffect(() => {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedId]);
+  }, [selectedId, objects, height, width]);
 
-  const handleSave = () => {
+  const handleEditProject = async (id) => {
+    try {
+        const updatedProject = {
+            title,
+            ...(description && { description }),
+            type: type && type.includes('x') ? `${width}x${height}` : type,
+            content: {
+                width,
+                height,
+                backgroundColor,
+                isTransparent,
+                showGrid,
+                gridColor,
+                thumbnailUrl: stageRef.current.toDataURL(),
+                renderableObjects: objects,
+            },
+        };
+
+        const updated = await projectService.editProject(id, updatedProject);
+    } catch (error) {
+        console.error('Error editing project:', error);
+    }
+};
+
+  const handleSave = async () => {
     localStorage.setItem('canvas-objects', JSON.stringify(objects));
+    if (hasLoaded) {
+      await handleEditProject(id);
+    }
   }
 
   const shareToFacebook = () => {
     const imageUrl = stageRef.current.toDataURL({mimeType: 'image/jpeg', quality: 1});
     const pageUrl = `http://localhost:5173/share?title=${encodeURIComponent(title)}&description=${encodeURIComponent(description)}`;
-    const shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(pageUrl)}`;
+    const shareUrl = `https://www.facebook.com/sharer/sharer.php?description=Title&u=${encodeURIComponent(pageUrl)}`;
     window.open(shareUrl, '_blank');
   };
 
@@ -339,6 +512,24 @@ export default function Canvas({ settings, activeTool, setActiveTool, paintTool,
       localStorage.setItem('canvas-history-step', String(historyStep.current));
     }
   }, [history.current, historyStep.current, hasLoaded]);
+
+  useEffect(() => {
+    if (hasLoaded) {
+    const updated = objects.map(obj => {
+      if (obj.isBackground) {
+        return {
+          ...obj,
+          x: width / 2,
+          y: height / 2,
+          width,
+          height,
+        };
+      }
+      return obj;
+    });
+    setObjects(updated);
+  }
+  }, [width, height]);
 
   return (<>
     <div className='toolbar'>
@@ -377,14 +568,23 @@ export default function Canvas({ settings, activeTool, setActiveTool, paintTool,
           <button onClick={() => setShowFormats(!showFormats)}>
             <img id='download-icon' src={`/images/editor/download${isDarkMode? '_white': ''}.png`} alt='Download' />
           </button>
-        {
-          showFormats && <DownloadModal setIsOpenModal={setShowFormats} handleExportImg={handleExportImg} handleExportPDF={handleExportPDF} projectTitle={title}/>
-        }
+        { showFormats && <>
+            <div className='dropdown-menu sort-dropdown'>
+                <div className='dropdown-option' onClick={() => handleExportImg('png')}><img src='https://static.thenounproject.com/png/11204-200.png' alt=''/>PNG</div>
+                <div className='dropdown-option' onClick={() => handleExportImg('jpg')}><img src='https://static.thenounproject.com/png/11204-200.png' alt=''/>JPG</div>
+                <div className='dropdown-option' onClick={() => handleExportImg('webp')}><img src='https://static.thenounproject.com/png/11204-200.png' alt=''/>WEBP</div>
+                <div className='dropdown-option' onClick={() => handleExportPDF()}><img  src='/images/editor/document.png' alt=''/>PDF</div>
+            </div>
+          </>}
         </div>
     </div>
+
+    <Scrollbar style={{ height: '84%', width: '95%', overflowX: 'auto', overflowY: 'auto', margin: '3%'}}>      
+    <div className='canvas-wrapper'>
     <div className='canvas' 
         onDragOver={(e) => e.preventDefault()}
         onDrop={(e) => {e.preventDefault(); handleDrop(e);}}>
+   
       <Stage  
         ref={stageRef} 
         width={width * zoom}
@@ -406,6 +606,31 @@ export default function Canvas({ settings, activeTool, setActiveTool, paintTool,
             />
         </Layer>
 
+        { showGrid && 
+            <Layer listening={false}>
+              {
+                Array.from({ length: Math.ceil(height / gridSize) }).map((_, i) => (
+                  <Line
+                    key={`h-${i}`}
+                    points={[0, i * gridSize, width, i * gridSize]}
+                    stroke={gridColor}
+                    strokeWidth={1}
+                  />
+                ))
+              }
+              {
+                Array.from({ length: Math.ceil(width / gridSize) }).map((_, i) => (
+                  <Line
+                    key={`v-${i}`}
+                    points={[i * gridSize, 0, i * gridSize, height]}
+                    stroke={gridColor}
+                    strokeWidth={1}
+                  />
+                ))
+              }
+            </Layer>
+        }
+        
         <Layer>
           {objects.map(obj => {
             const commonProps = {
@@ -417,13 +642,13 @@ export default function Canvas({ settings, activeTool, setActiveTool, paintTool,
                 setSelectedId(obj.id);
               },
               onDragStart: (e: any) => handleDragStart(obj.id, e),
+              onDragMove: (e: any) => handleDragMove(obj.id, e),
               onDragEnd: (e: any) => handleDragEnd(obj.id, e),
+              onTransform: (e: any) => handleTransform(obj.id, e),
               onTransformEnd: (e: any) => handleTransformEnd(obj.id, e),
             };
 
-            if (obj.type === 'rect') {
-              return <Rect key={obj.id} {...commonProps} />;
-            } else if (obj.type === 'text') {
+            if (obj.type === 'text') {
               return <Text
                 key={obj.id}
                 {...commonProps}
@@ -432,11 +657,27 @@ export default function Canvas({ settings, activeTool, setActiveTool, paintTool,
                 fontWeight={obj.fontVariant === 'bold' ? 'bold' : 'normal'}
                 textDecoration={obj.textDecoration || 'none'}
               />;
-            } else if (obj.type === 'image') {
+            } else if (obj.type === 'rect') {
+              return <Rect key={obj.id} {...commonProps} />;
+            }
+            else if (obj.type === 'image') {
               return <CanvasImage
                 key={obj.id}
                 obj={obj}
-                {...commonProps}
+                imageRefs={imageRefs}
+                width={obj.width}
+                height={obj.height}
+                ref={(node: any) => {
+                  shapeRefs.current[obj.id] = node;
+                }}
+                draggable={true}
+                onClick={(e: any) => {
+                  e.cancelBubble = true;
+                  setSelectedId(obj.id);
+                }}
+                onDragStart={(e: any) => handleDragStart(obj.id, e)}
+                onDragEnd={(e: any) => handleDragEnd(obj.id, e)}
+                onTransformEnd={(e: any) => handleTransformEnd(obj.id, e)}
               />;
             } else if (obj.type === 'circle') {
               return <Circle key={obj.id} radius={obj.width / 2} {...commonProps} />;
@@ -496,6 +737,9 @@ export default function Canvas({ settings, activeTool, setActiveTool, paintTool,
         </Layer>
 
       </Stage>
+      
     </div>
+    </div>
+    </Scrollbar>
   </>);
 }

@@ -311,7 +311,7 @@ const ProfileContent = ({ user }) => {
                 className="graphicraft-toast"
             />
 
-            <div className="h-[800px] bg-white dark:bg-black flex overflow-hidden">
+            <div className="h-[900px] bg-white dark:bg-black flex overflow-hidden">
                 {/* Desktop Sidebar */}
                 <div className="hidden md:flex md:flex-col md:w-64 bg-white dark:bg-black border-r border-gray-200 dark:border-gray-800 flex-shrink-0">
                     {/* User Info */}

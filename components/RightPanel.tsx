@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useHistoryContext } from '../contexts/HistoryContext';
+import Scrollbar from 'react-scrollbars-custom';
 
 export default function RightPanel({setIsOpenRight}) {
     const { history, historyStep, goToStep } = useHistoryContext();
@@ -22,6 +23,7 @@ export default function RightPanel({setIsOpenRight}) {
     return (
         <div className='right-panel'>
             <h2>History</h2>
+            <Scrollbar className='tmp-scroll' style={{ height: '710px', width: '75%', margin: 'auto' }} noScrollX>
             <div className='history-info'>
             {localHistory.map((h, i) => (
                 <div key={i} style={{ fontWeight: i === historyStep.current ? 'bold' : 'normal' }} onClick={() => handleStepClick(i)}>
@@ -29,6 +31,7 @@ export default function RightPanel({setIsOpenRight}) {
                 </div>
             ))}
             </div>
+            </Scrollbar>
             <button className="rp-close-btn right-panel-toggle" onClick={() => setIsOpenRight(false)}>{'>'}</button>
         </div>
     );

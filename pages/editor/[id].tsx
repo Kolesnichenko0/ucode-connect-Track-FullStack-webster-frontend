@@ -1,18 +1,35 @@
-import '../styles/editor.css';
+import '../../styles/editor.css';
 import { useState, useEffect } from 'react';
-import ImagesPanel from '../components/ImagesPanel';
-import ElementsPanel from '../components/ElementsPanel';
-import InfoPanel from '../components/InfoPanel';
-import PaintPanel from '../components/PaintPanel';
-import TextPanel from '../components/TextPanel';
-import Tooltip from '../components/Tooltip';
-import { useTheme } from '../contexts/ThemeContext';
-import { CanvasObject } from '../types/CanvasObject';
+import ImagesPanel from '../../components/ImagesPanel';
+import ElementsPanel from '../../components/ElementsPanel';
+const EditImagePanel = dynamic(() => import('../../components/EditImagePanel'), { ssr: false });
+import InfoPanel from '../../components/InfoPanel';
+import PaintPanel from '../../components/PaintPanel';
+import TextPanel from '../../components/TextPanel';
+import Tooltip from '../../components/Tooltip';
+import { useTheme } from '../../contexts/ThemeContext';
+import { CanvasObject } from '../../types/CanvasObject';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
-const Canvas = dynamic(() => import('../components/Canvas'), { ssr: false });
-import { HistoryProvider } from '../contexts/HistoryContext';
-import RightPanel from '../components/RightPanel';
+const Canvas = dynamic(() => import('../../components/Canvas'), { ssr: false });
+import { HistoryProvider } from '../../contexts/HistoryContext';
+import RightPanel from '../../components/RightPanel';
+import AIPanel from '../../components/AIPanel';
+import projectService from '../../services/projectService';
+
+const defaultSettings = {
+  id: 0,
+  title: '',
+  description: '',
+  width: 900,
+  height: 600,
+  type: '900x600',
+  isTemplate: false,
+  isTransparent: true,
+  backgroundColor: '#dedede',
+  showGrid: false,
+  gridColor: 'black',
+};
 
 export default function EditorPage() {
   const [isOpenLeft, setIsOpenLeft] = useState(false);
@@ -22,6 +39,7 @@ export default function EditorPage() {
   const [objects, setObjects] = useState<CanvasObject[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [paintTool, setPaintTool] = useState<'brush' | 'eraser' | null>(null);
+  const router = useRouter();
   const [textSettings, setTextSettings] = useState({
     text: 'Input text',
     fontSize: 24,
@@ -31,29 +49,36 @@ export default function EditorPage() {
     fontVariant: 'normal',
     textDecoration: 'none'
   });
-  const [settings, setSettings] = useState({
-    title: '',
-    description: '',
-    width: 900,
-    height: 600,
-    isTemplate: false,
-    isTransparent: true,
-    backgroundColor: '#dedede',
-  });
-  const [paintSettings, setPaintSettings] = useState({
-    fill: '#000000',
-    strokeWidth: 5,
-    opacity: 1,
-  });
-  const { isDarkMode } = useTheme();
-  const router = useRouter();
-
-  useEffect(() => {
-    const isNewProject = router.query.new === 'true';
-    const savedInfo = localStorage.getItem('editorSettings');
-
+ /* const [settings, setSettings] = useState(() => {
+    const { new: isNewProjectQuery, width, height, title, description, isTransparent, backgroundColor, ...restQuery } = router.query;
+    const isNewProject = isNewProjectQuery === 'true';
+    const projectId = router.query.id as string;
+    
+    if (typeof window === 'undefined') {
+      return {
+        id: Number(projectId),
+        title: '',
+        description: '',
+        width: 900,
+        height: 600,
+        type: '900x600',
+        isTemplate: false,
+        isTransparent: true,
+        backgroundColor: '#dedede',
+        showGrid: false,
+        gridColor: 'black',
+      };
+    }
+    
     if (isNewProject && router.query.width && router.query.height) {
-      setSettings({
+      const { new: _, ...restQuery } = router.query;
+      router.replace({
+        pathname: router.pathname,
+        query: restQuery,
+      }, undefined, { shallow: true });
+      
+      return {
+        id: Number(router.query.id),
         title: String(router.query.title),
         description: String(router.query.description),
         width: Number(router.query.width),
@@ -61,18 +86,93 @@ export default function EditorPage() {
         isTemplate: false,
         isTransparent: router.query.isTransparent === 'true',
         backgroundColor: String(router.query.backgroundColor),
-      });
-      const { new: _, ...restQuery } = router.query;
-      router.replace({
-        pathname: router.pathname,
-        query: restQuery,
-      }, undefined, { shallow: true });
+        showGrid: false,
+        gridColor: 'black',
+      };
     }
-    else if (savedInfo) {
-      setSettings(JSON.parse(savedInfo));
+    else {
+      const savedInfo = localStorage.getItem('editorSettings');
+      if (savedInfo) {
+        return JSON.parse(savedInfo);
+      }
     }
+});*/
+const [settings, setSettings] = useState(() => {
+  if (typeof window !== 'undefined') {
+    const saved = localStorage.getItem('editorSettings');
+    if (saved) return JSON.parse(saved);
+  }
+  return defaultSettings;
+});
+  const isSettingsReady = settings && settings.id > 0 && settings.width && settings.height;
+  const [paintSettings, setPaintSettings] = useState({
+    fill: '#000000',
+    strokeWidth: 5,
+    opacity: 1,
+  });
+  const { isDarkMode } = useTheme();
 
-  }, [router.query]);
+  useEffect(() => {
+    const loadProjectSettings = async () => {
+      if (!router.isReady || !router.query.id) {
+        return;
+      }
+
+      const projectId = Array.isArray(router.query.id) ? router.query.id[0] : router.query.id;
+      const isNewProjectQuery = router.query.new === 'true';
+
+      if (isNewProjectQuery && projectId) {
+        if (isNewProjectQuery) {
+          const { new: _, ...restQuery } = router.query;
+          router.replace({
+            pathname: router.pathname,
+            query: restQuery,
+          }, undefined, { shallow: true });
+        }
+        
+        try {
+          const fetchedProject = await projectService.getProject(Number(projectId));
+          console.log('Fetched project:', fetchedProject);
+
+          setSettings({
+            id: Number(projectId),
+            title: fetchedProject.title,
+            description: fetchedProject.description,
+            width: fetchedProject.content?.width,
+            height: fetchedProject.content?.height,
+            isTemplate: fetchedProject.isTemplate,
+            isTransparent: fetchedProject.content?.isTransparent,
+            backgroundColor: fetchedProject.content?.backgroundColor,
+            showGrid: fetchedProject.content?.showGrid,
+            gridColor: fetchedProject.content?.gridColor,
+            type: fetchedProject.content?.type,
+          });
+
+          if (fetchedProject.content?.renderableObjects) {
+            setObjects(fetchedProject.content.renderableObjects);
+          }
+
+          localStorage.removeItem('canvas-objects');
+          localStorage.removeItem('canvas-history');
+          localStorage.removeItem('canvas-history-step');
+
+        } catch (err: any) {
+          const savedInfo = localStorage.getItem('editorSettings');
+          if (savedInfo) {
+            setSettings(JSON.parse(savedInfo));
+            console.warn('Fallback to localStorage settings due to project load error.');
+          }
+        }
+      } else {
+        const savedInfo = localStorage.getItem('editorSettings');
+        if (savedInfo) {
+          setSettings(JSON.parse(savedInfo));
+        }
+      }
+    };
+
+    loadProjectSettings();
+  }, [router.isReady, router.query.id]);
 
   useEffect(() => {
     localStorage.setItem('editorSettings', JSON.stringify(settings));
@@ -128,6 +228,9 @@ export default function EditorPage() {
           <Tooltip title="Paint" description="🖌️ Draw, erase, experiment!" image={`/images/tooltip/paint-panel.png`}>
             <button id='paint-btn'><img id='paint-icon' src={`/images/editor/paint${isDarkMode? '_white': ''}.png`} alt='Paint' onClick={() => {handleLeftTabClick('paint')}}/></button>
           </Tooltip>
+          <Tooltip title="AI Image Generator" description="🤖 Describe your idea — and AI will draw it for you!" image={`/images/tooltip/ai-panel.jpg`}>
+            <button id='ai-btn'><img id='ai-icon' src={`/images/editor/ai${isDarkMode? '_white': ''}.png`} alt='AI' onClick={() => {handleLeftTabClick('ai')}}/></button>
+          </Tooltip>
           <Tooltip title="Instruction" description="📖 Don't know where to start? Everything is explained here!" image={`/images/tooltip/instruction-panel.png`}>
             <button id='instruction-btn'><img id='instruction-icon' src={`/images/editor/instruction${isDarkMode? '_white': ''}.png`} alt='Instruction' onClick={() => {handleLeftTabClick('instruction')}}/></button>
           </Tooltip>
@@ -139,7 +242,7 @@ export default function EditorPage() {
           <InfoPanel settings={settings} setSettings={setSettings}/>
         }
         {activeLeftTab === 'elements' &&
-          <ElementsPanel activeTool={activeTool} setActiveTool={setActiveTool} selectedObject={objects.find(obj => obj.id === selectedId)} objects={objects} setObjects={setObjects}/>
+          <ElementsPanel settings={settings} activeTool={activeTool} setActiveTool={setActiveTool} selectedObject={objects.find(obj => obj.id === selectedId)} objects={objects} setObjects={setObjects}/>
         }
         {activeLeftTab === 'text' &&
           <TextPanel
@@ -155,15 +258,19 @@ export default function EditorPage() {
           <ImagesPanel/>
         }
         {activeLeftTab === 'edit-img' &&
-          <></>
+          <EditImagePanel width={settings?.width} height={settings?.height} selectedObject={objects.find(obj => obj.id === selectedId)} objects={objects} setObjects={setObjects}/>
         }
         {activeLeftTab === 'paint' &&
           <PaintPanel paintTool={paintTool} setPaintTool={setPaintTool} paintSettings={paintSettings} setPaintSettings={setPaintSettings}/>
+        }
+        {activeLeftTab === 'ai' &&
+          <AIPanel/>
         }
       </div>
       }
 
       <main className='editorArea'>
+      {isSettingsReady ? (
         <Canvas
           settings={settings}
           activeTool={activeTool}
@@ -175,7 +282,11 @@ export default function EditorPage() {
           selectedId={selectedId}
           setSelectedId={setSelectedId}
           textSettings={textSettings}/>
+      ) : (
+          <div className="loading">Loading...</div>
+      )}
       </main>
+     
      
       { isOpenRight &&
         <RightPanel setIsOpenRight={setIsOpenRight}/>

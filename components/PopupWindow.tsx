@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/router';
 import { HuePicker } from 'react-color';
+import { useAuth } from '../contexts/AuthContext';
+import projectService from '../services/projectService';
+import axios from 'axios';
 
 const templates = {
     photo: [
@@ -22,6 +25,7 @@ const templates = {
 };
 
 const PopupWindow = ({setIsOpenModal}) => {
+    const { user } = useAuth();
     const router = useRouter();
     const [tab, setTab] = useState<'photo' | 'social' | 'web'>('photo');
     const [title, setTitle] = useState('Untitled');
@@ -32,30 +36,56 @@ const PopupWindow = ({setIsOpenModal}) => {
     const [backgroundColor, setBackgroundColor] = useState('#dedede');
     const [isTransparent, setIsTransparent] = useState(true);
 
-
     const handleTemplateClick = (size: string) => {
         const [w, h] = size.split('x').map(Number);
         setWidth(w);
         setHeight(h);
     };
 
-    const generateContent = (userId: number) => {
-      const timestamp = Date.now();
-    
-      return {
-        id: `project_${timestamp}_${Math.random().toString(36).substr(2, 8)}`,
-        title: title || 'Untitled',
-        description: description || '',
-        width,
-        height,
-        createdAt: new Date().toISOString(),
-        lastModified: new Date().toISOString(),
-        thumbnailUrl: null,
-        backgroundColor,
-        isTransparent,
-        objects: [],
-        userId
-      };
+    const handleCreateProject = async () => {
+      try {
+        const userId = user?.id;
+        const newProject = {
+          authorId: userId,
+          title,
+          ...(description && { description }),
+          type: activeTmp ? activeTmp : `${width}x${height}`,
+          isTemplate: false,
+          content: {
+            width,
+            height,
+            backgroundColor,
+            isTransparent,
+            showGrid: false,
+            gridColor: 'black',
+            renderableObjects:[],
+          },
+        };
+        
+        const createdProject = await projectService.createProject(newProject);
+        console.log('Created project:', createdProject);
+
+        router.push({
+          pathname: `/editor/[id]`,
+          query: {
+            id: createdProject.id,
+            new: 'true',
+          },
+        });
+
+        setIsOpenModal(false);
+        localStorage.removeItem('canvas-objects');
+        localStorage.removeItem('canvas-history');
+        localStorage.removeItem('canvas-history-step');
+      } catch (error: unknown) {
+        if (axios.isAxiosError(error)) { 
+          console.log('Error response from server:', error.response?.data);
+        } else if (error instanceof Error) { 
+          console.log('General error:', error.message);
+        } else {
+          console.log('Unknown error:', error);
+        }
+      }
     };
 
     return(<>
@@ -145,23 +175,8 @@ const PopupWindow = ({setIsOpenModal}) => {
             id='popup-create-btn' 
             className='popup-btn' 
             onClick={() => {
-              setIsOpenModal(false),
-              localStorage.removeItem('canvas-objects'),
-              localStorage.removeItem('canvas-history'),
-              localStorage.removeItem('canvas-history-step'),
-              router.push({
-                pathname: '/editor',
-                query: {
-                  title,
-                  description,
-                  width,
-                  height,
-                  isTransparent,
-                  backgroundColor,
-                  new: 'true',
-                },
-              });
-            } }>
+              handleCreateProject()
+            }}>
               Create something incredible
             </button>
             </div> 

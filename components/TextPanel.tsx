@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useTheme } from '../contexts/ThemeContext';
 import { CanvasObject } from '../types/CanvasObject';
 import { useHistoryContext } from '../contexts/HistoryContext';
@@ -50,7 +50,8 @@ const TextPanel: React.FC<TextPanelProps> = ({
     fill: '#000000',
     fontStyle: 'normal',
     fontVariant: 'normal',
-    textDecoration: 'none'
+    textDecoration: 'none',
+    align: 'none',
   });
 
   const [currentTextSettings, setCurrentTextSettings] = useState(defaultTextSettings);
@@ -208,7 +209,8 @@ const TextPanel: React.FC<TextPanelProps> = ({
         fill: selectedObject.fill || '#000000',
         fontStyle: selectedObject.fontStyle || 'normal',
         fontVariant: selectedObject.fontVariant || 'normal',
-        textDecoration: selectedObject.textDecoration || 'none'
+        textDecoration: selectedObject.textDecoration || 'none',
+        align: selectedObject.align || 'none',
       };
       setCurrentTextSettings(settings);
       setTextValue(selectedObject.text || 'Input text');
@@ -263,6 +265,22 @@ const TextPanel: React.FC<TextPanelProps> = ({
     }
   };
 
+  const updateHighlightColor = (newColor: string) => {
+    if (!selectedObject?.id) return;
+    
+    setObjects(prev => {
+      return prev.map(obj => {
+        if (obj.id === `${selectedObject.id}-rect`) {
+          return {
+            ...obj,
+            fill: newColor,
+          };
+        }
+        return obj;
+      });
+    });
+  };
+
   const handleFontSelect = (fontFamily: string) => {
     if (googleFonts.some(font => font.family === fontFamily)) {
       loadFont(fontFamily);
@@ -284,6 +302,11 @@ const TextPanel: React.FC<TextPanelProps> = ({
     const newDecoration = currentTextSettings.textDecoration === 'underline' ? 'none' : 'underline';
     handleTextSettingChange('textDecoration', newDecoration);
   };
+
+  const toggleAlignment = (newAlign: string) => {
+    newAlign = currentTextSettings.align === newAlign ? 'none' : newAlign;
+    handleTextSettingChange('align', newAlign);
+  }
 
   const toggleStrikethrough = () => {
     const newDecoration = currentTextSettings.textDecoration === 'line-through' ? 'none' : 'line-through';
@@ -326,18 +349,22 @@ const TextPanel: React.FC<TextPanelProps> = ({
     transition: 'background-color 0.15s ease'
   };
 
+  const highlightObj = objects.find(
+    (obj): obj is Extract<CanvasObject, { type: 'rect' }> =>
+      obj.id === `${selectedObject?.id}-rect` && obj.type === 'rect'
+  );
+  const highlightFill = highlightObj? highlightObj.fill : 'transparent';
+
   return (
     <div className="text-panel" style={{
-      padding: '16px',
+      padding: '10px',
+      paddingTop: '0px',
     }}>
-      <h3 style={{ margin: '0 0 16px 0', fontSize: '16px', fontWeight: '600' }}>
-        Text tools
-      </h3>
 
       <button
         onClick={handleAddText}
         className='upload-btn'
-        style={{ marginBottom: '16px' }}
+        style={{ marginBottom: '16px', marginTop: '10px' }}
       >
         {activeTool === 'text' ? 'Click on the canvas' : 'Add text'}
       </button>
@@ -659,6 +686,7 @@ const TextPanel: React.FC<TextPanelProps> = ({
           />
           <input
             type="text"
+            className='text-color-input'
             value={currentTextSettings.fill}
             onChange={(e) => handleTextSettingChange('fill', e.target.value)}
             style={{
@@ -675,6 +703,98 @@ const TextPanel: React.FC<TextPanelProps> = ({
       </div>
 
       <div style={{ marginBottom: '16px' }}>
+        <label style={{ display: 'block', fontSize: '15px', marginBottom: '4px', fontWeight: '500' }}>
+          Highlight
+        </label>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <input
+            type="color"
+            value={highlightFill}
+            onChange={(e) => updateHighlightColor(e.target.value)}
+            style={{
+              width: '40px',
+              height: '32px',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer'
+            }}
+          />
+          <input
+            type="text"
+            value={highlightFill}
+            onChange={(e) => updateHighlightColor(e.target.value)}
+            className='text-color-input'
+            style={{
+              flex: 1,
+              padding: '8px',
+              border: `1px solid ${isDarkMode ? '#4b5563' : '#d1d5db'}`,
+              borderRadius: '4px',
+              backgroundColor: '#dadada',
+              color: '#000000',
+              fontSize: '12px'
+            }}
+          />
+        </div>
+      </div>
+
+      <div style={{ marginBottom: '16px' }}>
+        <label style={{ display: 'block', fontSize: '15px', marginBottom: '4px', fontWeight: '500' }}>
+          Alignment
+        </label>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr' , gap: '8px' }}>
+          <button
+            onClick={() => toggleAlignment('left')}
+            style={{
+              padding: '4px',
+              backgroundColor: currentTextSettings.align === 'left' ? (isDarkMode ? '#0462c6' : '#75b7ff') : (isDarkMode ? '#dadada' : '#dadada'),
+              color: '#000000',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontWeight: 'bold',
+              display: 'flex',        
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" style={{width: '25px', fill: isDarkMode && currentTextSettings.align === 'left' ? 'white' :'#000000'}} shape-rendering="geometricPrecision" text-rendering="geometricPrecision" image-rendering="optimizeQuality" fill-rule="evenodd" clip-rule="evenodd" viewBox="0 0 512 371.6"><path fill-rule="nonzero" d="M0 0h359.79v26.31H0V0zm0 115.09h512v26.33H0v-26.33zm.01 115.1h183.02v26.32H.01v-26.32zM0 345.29h302.42v26.31H0v-26.31z"/></svg>
+          </button>
+          <button
+            onClick={() => toggleAlignment('center')}
+            style={{
+              padding: '8px',
+              backgroundColor: currentTextSettings.align === 'center' ? (isDarkMode ? '#0462c6' : '#75b7ff') : (isDarkMode ? '#dadada' : '#dadada'),
+              color: '#000000',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              display: 'flex',        
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" style={{width: '25px', fill: isDarkMode && currentTextSettings.align === 'center' ? 'white' :'#000000'}} shape-rendering="geometricPrecision" text-rendering="geometricPrecision" image-rendering="optimizeQuality" fill-rule="evenodd" clip-rule="evenodd" viewBox="0 0 512 341.15"><path fill-rule="nonzero" d="M90.85 0h330.3v24.16H90.85V0zM0 105.72h512v24.04H0v-24.04zm171.99 105.61h168.02v24.16H171.99v-24.16zM117.18 317h277.64v24.15H117.18V317z"/></svg>
+          </button>
+          <button
+            onClick={() => toggleAlignment('right')}
+            style={{
+              padding: '8px',
+              backgroundColor: currentTextSettings.align === 'right' ? (isDarkMode ? '#0462c6' : '#75b7ff')  : (isDarkMode ? '#dadada' : '#dadada'),
+              color: '#000000',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              display: 'flex',        
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" style={{width: '25px', fill: isDarkMode && currentTextSettings.align === 'right' ? 'white' :'#000000'}} shape-rendering="geometricPrecision" text-rendering="geometricPrecision" image-rendering="optimizeQuality" fill-rule="evenodd" clip-rule="evenodd" viewBox="0 0 512 404.77"><path fill-rule="nonzero" d="M120.1 0H512v28.66H120.1V0zM0 125.48h512v28.43H0v-28.43zm312.64 125.25H512v28.68H312.64v-28.68zM182.59 376.11H512v28.66H182.59v-28.66z"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div style={{ marginBottom: '16px' }}>
         <label style={{ display: 'block', fontSize: '15px', marginBottom: '8px', fontWeight: '500' }}>
           Styles
         </label>
@@ -683,8 +803,8 @@ const TextPanel: React.FC<TextPanelProps> = ({
             onClick={toggleBold}
             style={{
               padding: '8px',
-              backgroundColor: currentTextSettings.fontVariant === 'bold' ? (isDarkMode ? '#acacac' : '#acacac') : (isDarkMode ? '#dadada' : '#dadada'),
-              color: '#000000',
+              backgroundColor: currentTextSettings.fontVariant === 'bold' ? (isDarkMode ? '#0462c6' : '#75b7ff')  : (isDarkMode ? '#dadada' : '#dadada'),
+              color: isDarkMode && currentTextSettings.fontVariant === 'bold' ? 'white' :'#000000',
               border: 'none',
               borderRadius: '4px',
               cursor: 'pointer',
@@ -698,8 +818,8 @@ const TextPanel: React.FC<TextPanelProps> = ({
             onClick={toggleItalic}
             style={{
               padding: '8px',
-              backgroundColor: currentTextSettings.fontStyle === 'italic' ? (isDarkMode ? '#acacac' : '#acacac') : (isDarkMode ? '#dadada' : '#dadada'),
-              color: '#000000',
+              backgroundColor: currentTextSettings.fontStyle === 'italic' ? (isDarkMode ? '#0462c6' : '#75b7ff')  : (isDarkMode ? '#dadada' : '#dadada'),
+              color: isDarkMode && currentTextSettings.fontStyle === 'italic' ? 'white' :'#000000',
               border: 'none',
               borderRadius: '4px',
               cursor: 'pointer',
@@ -713,8 +833,8 @@ const TextPanel: React.FC<TextPanelProps> = ({
             onClick={toggleUnderline}
             style={{
               padding: '8px',
-              backgroundColor: currentTextSettings.textDecoration === 'underline' ? (isDarkMode ? '#acacac' : '#acacac') : (isDarkMode ? '#dadada' : '#dedede'),
-              color: '#000000',
+              backgroundColor: currentTextSettings.textDecoration === 'underline' ? (isDarkMode ? '#0462c6' : '#75b7ff')  : (isDarkMode ? '#dadada' : '#dedede'),
+              color: isDarkMode && currentTextSettings.textDecoration === 'underline' ? 'white' :'#000000',
               border: 'none',
               borderRadius: '4px',
               cursor: 'pointer',
@@ -728,8 +848,8 @@ const TextPanel: React.FC<TextPanelProps> = ({
             onClick={toggleStrikethrough}
             style={{
               padding: '8px',
-              backgroundColor: currentTextSettings.textDecoration === 'line-through' ? (isDarkMode ? '#acacac' : '#acacac') : (isDarkMode ? '#dadada' : '#dadada'),
-              color: '#000000',
+              backgroundColor: currentTextSettings.textDecoration === 'line-through' ? (isDarkMode ? '#0462c6' : '#75b7ff')  : (isDarkMode ? '#dadada' : '#dadada'),
+              color: isDarkMode && currentTextSettings.textDecoration === 'line-through' ? 'white' :'#000000',
               border: 'none',
               borderRadius: '4px',
               cursor: 'pointer',

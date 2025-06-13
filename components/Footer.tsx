@@ -8,10 +8,10 @@ export default function Footer() {
           {/* Logo and Description */}
           <div className="mb-6 md:mb-0 md:max-w-xs">
             <div className="flex items-center">
-              <div className="w-8 h-8 bg-gray-900 dark:bg-gray-100 rounded-lg flex items-center justify-center shadow-sm">
-                <span className="text-white dark:text-black text-lg font-bold">G</span>
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center shadow-sm">
+                <img src='/logo.png' alt='logo'></img>
               </div>
-              <h2 className="ml-2 text-lg font-bold text-gray-900 dark:text-white">GraphiCraft</h2>
+              <h2 style={{ fontFamily: 'Tsukimi Rounded' }} className="ml-2 text-lg font-bold text-gray-900 dark:text-white">Aurelia</h2>
             </div>
             <p className="mt-2 text-sm text-gray-600 dark:text-gray-400 pr-4">
               Design without limits. Create beautiful graphics for any project.
@@ -85,7 +85,7 @@ export default function Footer() {
         {/* Copyright */}
         <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-800 flex flex-col sm:flex-row justify-between items-center">
           <p className="text-xs text-gray-500 dark:text-gray-400">
-            &copy; {new Date().getFullYear()} GraphiCraft. All rights reserved.
+            &copy; {new Date().getFullYear()} Aurelia. All rights reserved.
           </p>
           
           <div className="mt-2 sm:mt-0">

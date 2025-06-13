@@ -19,10 +19,12 @@
     --sidebar-border: #ccc;
     --canvas: white; /*#c1bdbd*/
     --toolbar-border: #ccc;
-    --active-panel: #d8d8d8;
+    --active-panel: #9cccff; /*#85c0ff*/ /*#d8d8d8*/
     --dropdown-menu-bg: #f0f0f0;
     --option-bg: #b3b3b3;
-    --project-bg: #e4e4e498;
+    --project-bg: #d4e8ff; /*#eef6ff*/ /*#e4e4e498*/
+    --canvas-shadow: #00000026;
+    --btn-bg: #75b7ff; /*#8ed8fa*/
   }
   
   /* Определяем переменные для темной темы, которые будут применяться при наличии класса dark */
@@ -44,10 +46,12 @@
     --sidebar-border: black;
     --canvas: #d8d8d8; /*#242424*/
     --toolbar-border: #292929;
-    --active-panel: #1f1f1f;
+    --active-panel: #0462c6; /*#1f1f1f*/
     --dropdown-menu-bg: #bebebe;
     --option-bg: #e4e4e4;
-    --project-bg: #ffffffe8;
+    --project-bg: #81bbfd; /*#9ecbff*/ /*#ffffffe8*/
+    --canvas-shadow: #ffffff1a;
+    --btn-bg: #0462c6;
   }
   
   /* Можно также добавить плавные переходы между темами */

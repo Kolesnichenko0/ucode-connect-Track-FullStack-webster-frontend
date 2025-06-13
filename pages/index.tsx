@@ -1,6 +1,12 @@
 import '../styles/main.css';
+import { useAuth } from '../contexts/AuthContext';
+import { useRouter } from 'next/router';
+import { useTheme } from '../contexts/ThemeContext';
 
 export default function MainPage() {
+    const { user } = useAuth();
+    const router = useRouter();
+    const { isDarkMode } = useTheme();
 
     return (
       <div className="page">
@@ -11,12 +17,12 @@ export default function MainPage() {
             <div className="slogan-text">
               <h2>Your Canvas Awaits: Paint Your Dreams!</h2>
               <p className='main-info'>
-              Our graphics editor is an intuitive tool that allows everyone, regardless of skill level, to create impressive images and designs. With a wide selection of templates, fonts and filters, you can easily adapt your work for social networks, advertising campaigns or personal projects. Our platform offers powerful image processing features to help you stand out from the rest. 
+              Aurelia is an intuitive tool that allows everyone, regardless of skill level, to create impressive images and designs. With a wide selection of templates, fonts and filters, you can easily adapt your work for social networks, advertising campaigns or personal projects. Our platform offers powerful image processing features to help you stand out from the rest. 
               <br/>Join us and open a world of endless possibilities for creativity!
               </p>
-              <a className="btn">Try now</a>
+              <a className="btn" onClick={() => user? router.push('/projects') : router.push('/login')}>Try now</a>
             </div>
-            <img src='images/jellyfish1.png' alt="Decorative" className="slogan-image" />
+            <img src={`${isDarkMode ? 'images/jellyfish-b.jpg' : 'images/jellyfish-w.jpg'}`} alt="Decorative" className="slogan-image" />
           </div>
           <div className="more-info">
             <span>More info</span>
@@ -82,27 +88,27 @@ export default function MainPage() {
             <h2>Target audience</h2>
             <div className="flex audience-grid">
                 <div className="audience-item">
-                  <div className="sphere"><img src='/images/main/designers.png' alt=''/></div>
+                  <div className="sphere"><img style={isDarkMode ? {} : {padding: '5px'}} src={`/images/main/designers${isDarkMode ? '': '_white' }.png`} alt=''/></div>
                   <p>Designers</p>
                 </div>
                 <div className="audience-item">
-                  <div className="sphere bottom-sphere"><img src='/images/main/marketers.png' alt=''/></div>
+                  <div className="sphere bottom-sphere"><img src={`/images/main/marketers${isDarkMode ? '': '_white' }.png`} alt=''/></div>
                   <p className="bottom-sphere">Marketers</p>
                 </div>
                 <div className="audience-item">
-                  <div className="sphere"><img src='/images/main/illustrators.png' alt=''/></div>
+                  <div className="sphere"><img src={`/images/main/illustrators${isDarkMode ? '': '_white' }.png`} alt=''/></div>
                   <p>Illustrators</p>
                 </div>
                 <div className="audience-item">
-                  <div className="sphere bottom-sphere"><img src='/images/main/games.png' alt=''></img></div>
+                  <div className="sphere bottom-sphere"><img style={isDarkMode ? {} : {padding: '5px'}} src={`/images/main/games${isDarkMode ? '': '_white' }.png`} alt=''></img></div>
                   <p className="bottom-sphere">Game Developers</p>
                 </div>
                 <div className="audience-item">
-                  <div className="sphere"><img src='/images/main/photo.png' alt=''/></div>
+                  <div className="sphere"><img src={`/images/main/photo${isDarkMode ? '': '_white' }.png`} alt=''/></div>
                   <p>Photographers</p>
                 </div>
                 <div className="audience-item">
-                  <div className="sphere bottom-sphere"><img src='/images/main/students.png' alt=''/></div>
+                  <div className="sphere bottom-sphere"><img style={isDarkMode ? {} : {padding: '5px'}} src={`/images/main/students${isDarkMode ? '': '_white' }.png`} alt=''/></div>
                   <p className="bottom-sphere">Students</p>
                 </div>
             </div>

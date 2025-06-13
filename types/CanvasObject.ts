@@ -66,15 +66,43 @@ export type CanvasObject =
       fontStyle?: string;
       fontVariant?: string;
       textDecoration?: string;
+      align?: string;
       width?: number;
       height?: number;
       opacity?: number;
     }
   | {
       id: string;
+      type: 'group';
+      x: number;
+      y: number;
+      children: CanvasObject[];
+  }
+  |{
+      id: string;
       type: 'image';
       x: number;
       y: number;
+      width?: number;
+      height?: number;
       src: string;
+      filters?: Array<(imageData: any) => any>;
       opacity?: number;
+      brightness?: number;
+      contrast?: number;
+      saturation?: number;
+      blurRadius?: number;
+      noise?: number;
+      pixelSize?: number;
+      grayscale?: boolean;
+      sepia?: boolean;
+      invert?: boolean;
+      emboss?: boolean;
+      rotation?: number;
+      scaleX?: number;
+      scaleY?: number;
+      offsetX?: number;
+      offsetY?: number;
+      isBackground?: boolean;
+      draggable?: boolean;
     };

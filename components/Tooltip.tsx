@@ -167,8 +167,8 @@ const Tooltip: React.FC<TooltipProps> = ({
       pointerEvents: "none",
       opacity: isVisible ? 1 : 0,
       transition: "opacity 0.2s ease-in-out",
-      backgroundColor: isDarkMode ? "#474747" : "#dbd9d9",
-      color: isDarkMode ? "white" : "black",
+      backgroundColor: isDarkMode ? "#81bbfd" : "#d4e8ff", /*"#474747" : "#dbd9d9" */
+      color: "black", /*isDarkMode ? "white" : "black" */
       padding: image ? "0 0 8px 0" : "6px 8px",
       borderRadius: "8px",
       fontSize: "12px",

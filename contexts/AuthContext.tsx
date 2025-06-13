@@ -40,7 +40,7 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const DEFAULT_AVATAR_URL = 'http://localhost:8080/assets/images/user-avatars/default-avatar.png';
+export const DEFAULT_AVATAR_URL = 'http://localhost:8080/assets/images/user-avatars/default-user-avatar.png';
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);

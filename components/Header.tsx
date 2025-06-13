@@ -99,7 +99,8 @@ export default function Header() {
     </button>
   );
 
-  return (
+  return (<>
+
     <header className="bg-white dark:bg-black border-b border-gray-200 dark:border-gray-800 sticky top-0 z-50">
       <div className="max-w-full mx-auto px-4">
         <div className="flex items-center justify-between h-16">
@@ -108,12 +109,10 @@ export default function Header() {
           <div className="flex items-center space-x-8">
             <Link href="/" className="flex items-center gap-2">
               <div className="relative h-8 w-8">
-                <div className="absolute top-0 left-0 h-8 w-8 bg-black dark:bg-white rounded-lg transform rotate-45 opacity-80"></div>
-                <div className="absolute top-0 left-0 h-8 w-8 bg-white dark:bg-black rounded-lg transform rotate-12 opacity-80"></div>
-                <div className="absolute top-0 left-0 h-8 w-8 bg-gray-800 dark:bg-gray-200 rounded-lg opacity-80"></div>
+                <img src='/logo.png' alt='logo'></img>
               </div>
-              <span className="text-xl font-bold text-black dark:text-white">
-                GraphiCraft
+              <span style={{ fontFamily: 'Tsukimi Rounded' }} className="text-black dark:text-white text-xl font-[600]">
+                Aurelia
               </span>
             </Link>
           </div>
@@ -191,10 +190,10 @@ export default function Header() {
               </div>
             ) : (
               <div className="flex items-center space-x-4">
-                <Link href="/login" className="text-sm rounded-lg border text-gray-700 px-4 py-2 dark:text-gray-200 hover:text-black dark:hover:text-white">
+                <Link href="/login" style={{ borderColor: isDarkMode ? '#0462c6' : '#75b7ff' }} className="text-sm rounded-lg border text-gray-700 px-4 py-2 dark:text-gray-200 hover:text-black dark:hover:text-white">
                   Login
                 </Link>
-                <Link href="/register" className="rounded-lg bg-black dark:bg-white text-white dark:text-black px-4 py-2 text-sm font-medium transition-colors hover:bg-gray-800 dark:hover:bg-gray-200">
+                <Link href="/register" style={{ backgroundColor: isDarkMode ? '#0462c6' : '#75b7ff' }} className="rounded-lg bg-black dark:bg-white text-white dark:text-black px-4 py-2 text-sm font-medium transition-colors hover:bg-gray-800 dark:hover:bg-gray-200">
                   Sign Up
                 </Link>
               </div>
@@ -231,12 +230,12 @@ export default function Header() {
             <div className="flex justify-between items-center p-4 border-b border-gray-200 dark:border-gray-800">
               <div className="flex items-center space-x-2">
                 <div className="relative h-8 w-8">
-                  <div className="absolute top-0 left-0 h-8 w-8 bg-black dark:bg-white rounded-lg transform rotate-45 opacity-80"></div>
-                  <div className="absolute top-0 left-0 h-8 w-8 bg-white dark:bg-black rounded-lg transform rotate-12 opacity-80"></div>
-                  <div className="absolute top-0 left-0 h-8 w-8 bg-gray-800 dark:bg-gray-200 rounded-lg opacity-80"></div>
-                </div>
-                <span className="text-lg font-bold text-black dark:text-white">
-                  GraphiCraft
+                  <div className="relative h-8 w-8">
+                    <img src='/logo.png' alt='logo'></img>
+                  </div>                
+              </div>
+                <span  style={{ fontFamily: 'Tsukimi Rounded' }} className="font-bold text-black dark:text-white text-xl">
+                  Aurelia
                 </span>
               </div>
               <button
@@ -310,7 +309,6 @@ export default function Header() {
 
               {!isAuthenticated && (
                 <>
-
                   <Link
                     href="/login"
                     className="block px-3 py-2 rounded-md text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 text-sm flex items-center"
@@ -354,5 +352,5 @@ export default function Header() {
         </div>
       )}
     </header>
-  );
+  </>);
 }

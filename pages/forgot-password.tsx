@@ -52,7 +52,7 @@ export default function ForgotPassword() {
                 <Link href="/" className="flex items-center gap-2">
                   <div className="flex-shrink-0 w-10 h-10 bg-gray-600 rounded-lg"></div>
                   <div>
-                    <div className="text-xl font-bold">GraphiCraft</div>
+                    <div className="text-xl font-bold">Aurelia</div>
                     <div className="text-xs text-gray-500 dark:text-gray-400">Design without limits</div>
                   </div>
                 </Link>
@@ -114,7 +114,7 @@ export default function ForgotPassword() {
                     className={`w-full h-12 rounded-none text-center transition-colors ${
                       loading
                         ? 'bg-gray-200 dark:bg-gray-800 cursor-not-allowed'
-                        : 'bg-black dark:bg-white text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-200'
+                        : 'bg-[#75b7ff] dark:bg-[#0462c6] text-white dark:text-black hover:bg-[#75b7ff] dark:hover:bg-[#0462c6]'
                     }`}
                   >
                     {loading ? (
@@ -144,14 +144,14 @@ export default function ForgotPassword() {
           <div className="w-full md:w-1/2 hidden md:block bg-black relative overflow-hidden">
             <div className="absolute inset-0 flex items-center justify-center">
               <img 
-                src="/images/jellyfish1.png" 
+                src="https://ukjellyfish.co.uk/wp-content/uploads/2016/12/Medium-jelly-e1631009252389.jpg" 
                 alt="Bioluminescent jellyfish" 
               />
               
               {/* Overlays and text */}
               <div className="absolute inset-0 flex flex-col items-center justify-center p-12 z-10 bg-black bg-opacity-10">
                 <div className="text-center">
-                  <h2 className="text-4xl font-bold text-white mb-2">GraphiCraft</h2>
+                  <h2 className="text-4xl font-bold text-white mb-2">Aurelia</h2>
                   <p className="text-xl text-gray-300">Design without limits</p>
                 </div>
               </div>

@@ -1,6 +1,8 @@
+@import url('https://fonts.cdnfonts.com/css/tsukimi-rounded');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
 
 /* Дополнительные пользовательские стили */
 html {

@@ -6,7 +6,8 @@ export default function Document() {
       <Head>
         {/* Добавляем фавиконку */}
         <link rel="icon" href="/logo.png" />
-        
+        <link href="https://fonts.cdnfonts.com/css/tsukimi-rounded" rel="stylesheet"/>
+                
         {/* Предзагрузка темы перед рендерингом страницы, чтобы избежать мигания */}
         <script
           dangerouslySetInnerHTML={{

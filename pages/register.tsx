@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useRouter } from 'next/router';
+import { useTheme } from '../contexts/ThemeContext';
 import Link from 'next/link';
 import Head from 'next/head';
 
@@ -16,6 +17,7 @@ export default function Register() {
   const [statusMessage, setStatusMessage] = useState({ type: '', message: '' });
   const [registrationSuccess, setRegistrationSuccess] = useState(false);
   const { register, loading, error: contextError, user, clearError } = useAuth();
+  const { isDarkMode } = useTheme();
   const router = useRouter();
 
   useEffect(() => {
@@ -355,6 +357,7 @@ export default function Register() {
 
                     <button
                       type="submit"
+                      style={{ backgroundColor: isDarkMode ? '#0462c6' : '#75b7ff' }}
                       disabled={loading || !!passwordError}
                       className={`w-full h-12 rounded-lg text-center transition-colors ${
                         loading || !!passwordError
@@ -402,7 +405,7 @@ export default function Register() {
           <div className="w-full md:w-1/2 hidden md:block bg-black relative overflow-hidden">
             <div className="absolute inset-0 flex items-center justify-center">
               <img 
-                src="/images/jellyfish1.png" 
+                src='https://ukjellyfish.co.uk/wp-content/uploads/2016/12/Medium-jelly-e1631009252389.jpg'
                 alt="Bioluminescent jellyfish" 
                 
               />
@@ -410,7 +413,7 @@ export default function Register() {
               {/* Overlays and text */}
               <div className="absolute inset-0 flex flex-col items-center justify-center p-12 z-10 bg-black bg-opacity-10">
                 <div className="text-center">
-                  <h2 className="text-4xl font-bold text-white mb-2">GraphiCraft</h2>
+                  <h2 className="text-4xl font-bold text-white mb-2">Aurelia</h2>
                   <p className="text-xl text-gray-300">Design without limits</p>
                 </div>
               </div>

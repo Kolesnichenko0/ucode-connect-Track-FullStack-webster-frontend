@@ -255,7 +255,7 @@ const [settings, setSettings] = useState(() => {
           />
         }
         {activeLeftTab === 'images' &&
-          <ImagesPanel/>
+          <ImagesPanel projectId={settings?.id} />
         }
         {activeLeftTab === 'edit-img' &&
           <EditImagePanel width={settings?.width} height={settings?.height} selectedObject={objects.find(obj => obj.id === selectedId)} objects={objects} setObjects={setObjects}/>

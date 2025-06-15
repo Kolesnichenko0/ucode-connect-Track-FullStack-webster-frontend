@@ -5,10 +5,19 @@ import { CanvasObject } from '../types/CanvasObject';
 import CanvasImage from './CanvasImage';
 import { Stage, Layer, Rect, Text, Transformer, Circle, Star, Line, Arrow, Group } from 'react-konva';
 import { useHistoryContext } from '../contexts/HistoryContext';
+import { TelegramShareButton, TwitterShareButton, TelegramIcon, TwitterIcon } from "next-share";
+import { toast } from 'react-toastify';
+import toastStyles from './ui/toastStyles';
+import 'react-toastify/dist/ReactToastify.css';
 import DownloadModal from './DownloadModal';
 import Konva from 'konva';
 import Scrollbar from 'react-scrollbars-custom';
 import projectService from '../services/projectService';
+
+interface ShareButtonsProps {
+  title: string
+  url: string
+}
 
 type DrawingLineObject = {
   id: string;
@@ -23,6 +32,7 @@ type DrawingLineObject = {
 export default function Canvas({ settings, activeTool, setActiveTool, paintTool, paintSettings, objects, setObjects, selectedId, setSelectedId, textSettings }) {
   const [hasLoaded, setHasLoaded] = useState(false);
   const [showFormats, setShowFormats] = useState(false);
+  const [showShareBtns, setShowShareBtns] = useState(false);
   const [isDrawing, setIsDrawing] = useState(false);
   const [currentLine, setCurrentLine] = useState<DrawingLineObject | null>(null);
   const [zoom, setZoom] = useState(1);
@@ -32,6 +42,7 @@ export default function Canvas({ settings, activeTool, setActiveTool, paintTool,
   const { isDarkMode } = useTheme();
   const { addHistoryStep, undo, redo, history, historyStep } = useHistoryContext();
   const imageRefs = useRef<Record<string, Konva.Image | null>>({});
+  const shareTitle = "Look at this cool photo!";
   const {
     id,
     title,
@@ -273,6 +284,7 @@ export default function Canvas({ settings, activeTool, setActiveTool, paintTool,
 
     if (src) {
       const img = new (window as any).Image();
+      img.crossOrigin = 'anonymous';
       img.src = src;
   
       img.onload = () => {
@@ -481,6 +493,26 @@ export default function Canvas({ settings, activeTool, setActiveTool, paintTool,
         };
 
         const updated = await projectService.editProject(id, updatedProject);
+        if (updated.error) {
+          toast.error(updated.message,  toastStyles(isDarkMode, true)/*{
+            position: 'bottom-right',
+            style: {
+                background: isDarkMode ? '#000000' : '#ffffff',
+                color: isDarkMode ? '#ffffff' : '#000000',
+                border: `1px solid ${isDarkMode ? '#374151' : '#e5e7eb'}`,
+            },
+        }*/);
+        } else {
+          toast.success('Project successfully saved',  toastStyles(isDarkMode)/*{
+          position: 'bottom-right',
+          style: {
+              background: isDarkMode ? '#000000' : '#ffffff',
+              color: isDarkMode ? '#ffffff' : '#000000',
+              border: `1px solid ${isDarkMode ? '#374151' : '#e5e7eb'}`,
+          },
+        }*/);
+        }
+        
     } catch (error) {
         console.error('Error editing project:', error);
     }
@@ -493,12 +525,26 @@ export default function Canvas({ settings, activeTool, setActiveTool, paintTool,
     }
   }
 
-  const shareToFacebook = () => {
-    const imageUrl = stageRef.current.toDataURL({mimeType: 'image/jpeg', quality: 1});
-    const pageUrl = `http://localhost:5173/share?title=${encodeURIComponent(title)}&description=${encodeURIComponent(description)}`;
-    const shareUrl = `https://www.facebook.com/sharer/sharer.php?description=Title&u=${encodeURIComponent(pageUrl)}`;
-    window.open(shareUrl, '_blank');
-  };
+  const copyImageToClipboard = async() => {
+    await handleSave();
+    const dataUrl = stageRef.current.toDataURL({ mimeType: 'image/png' });
+
+    const res = await fetch(dataUrl);
+    const blob = await res.blob();
+
+    if (!blob) {
+      alert("Unable to get image to copy");
+      return;
+    }
+
+    await navigator.clipboard.write([
+      new ClipboardItem({
+        [blob.type]: blob,
+      }),
+    ]);
+
+    alert("Image copied to clipboard!");
+  }
 
   useEffect(() => {
     if (hasLoaded) {
@@ -561,9 +607,34 @@ export default function Canvas({ settings, activeTool, setActiveTool, paintTool,
         <button className='save' onClick={handleSave}>
           <img id='save-icon' src={`/images/editor/save${isDarkMode? '_white': ''}.png`} alt='Save' />
         </button>
-        <button className='save' onClick={shareToFacebook}>
-          <img id='share-icon' src={`/images/editor/share${isDarkMode? '_white': ''}.png`} alt='Share' />
-        </button>
+        <div className='dropdown'>
+          <button className='save' onClick={() => setShowShareBtns(!showShareBtns)}>
+            <img id='share-icon' src={`/images/editor/share${isDarkMode? '_white': ''}.png`} alt='Share' />
+          </button>
+          { showShareBtns && <>
+            <div className='dropdown-menu sort-dropdown share-dropdown-menu'>
+            <div className="dropdown-option" onClick={() => copyImageToClipboard()}>
+              <img src="/images/copy-icon.png" alt="" style={{ width: '24px' }} /> Copy Image
+            </div>
+
+            <div className="dropdown-option">
+              <TelegramShareButton url={shareTitle} title={`${shareTitle} – See what I created!`}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <TelegramIcon size={24} round /> Telegram
+                </div>
+              </TelegramShareButton>
+            </div>
+
+            <div className="dropdown-option">
+              <TwitterShareButton url={shareTitle} title={`${shareTitle} – See what I created!`}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <TwitterIcon size={24} round /> Twitter
+                </div>
+              </TwitterShareButton>
+            </div>
+            </div>
+          </>}
+        </div>
         <div className='dropdown'>
           <button onClick={() => setShowFormats(!showFormats)}>
             <img id='download-icon' src={`/images/editor/download${isDarkMode? '_white': ''}.png`} alt='Download' />
@@ -699,11 +770,11 @@ export default function Canvas({ settings, activeTool, setActiveTool, paintTool,
                 />
               );
             } else if (obj.type === 'line') {
-              return <Line key={obj.id} points={[0, 0, obj.width, obj.height]} lineCap="round" lineJoin="round" stroke="black" {...commonProps} />;
+              return <Line key={obj.id} points={[0, 0, obj.width, obj.height]} hitStrokeWidth={30} lineCap="round" lineJoin="round" stroke="black" {...commonProps} />;
             } else if (obj.type === 'arrow') {
-              return <Arrow key={obj.id} points={[0, 0, obj.width, obj.height]} fill="black" stroke="black" {...commonProps} />;
+              return <Arrow key={obj.id} points={[0, 0, obj.width, obj.height]} hitStrokeWidth={30} fill="black" stroke="black" {...commonProps} />;
             } else if (obj.type === 'curve-line') {
-              return <Line key={obj.id} tension={0.5} points={[
+              return <Line key={obj.id} tension={0.5} hitStrokeWidth={30} points={[
                 0, 0,
                 obj.width / 2, -Math.max(obj.height, 50) / 2,
                 obj.width, 0,

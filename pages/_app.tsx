@@ -65,17 +65,14 @@ function MyApp({ Component, pageProps }: AppProps & { Component: NextPage & { hi
             </ProtectedRoute>
           </main>
           {!hideFooter && <Footer />}
-          <ToastContainer 
-            position="top-right"
-            autoClose={5000}
-            hideProgressBar={false}
-            newestOnTop
-            closeOnClick
-            rtl={false}
-            pauseOnFocusLoss
-            draggable
-            pauseOnHover
-            theme="colored"
+          <ToastContainer
+              position="bottom-right"
+              newestOnTop={false}
+              closeOnClick
+              rtl={false}
+              pauseOnFocusLoss
+              draggable
+              pauseOnHover
           />
         </div>
       </AuthProvider>

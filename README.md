@@ -1,48 +1,35 @@
-# UEvent Frontend
+# Aurelia Frontend
 
-**UEvent** is a modern, feature-rich event management platform designed to help organizers create, manage, and promote events while providing attendees with a seamless registration experience. The frontend delivers an intuitive user interface that connects seamlessly with the UEvent backend API.
-
-## Table of Contents
-- [Overview](#overview)
-- [Features](#features)
-- [Requirements and Dependencies](#requirements-and-dependencies)
-- [Setup Instructions](#setup-instructions)
-- [User Interface](#user-interface)
-- [State Management](#state-management)
-- [Event Management](#event-management)
-- [Responsive Design](#responsive-design)
-- [Screenshots](#screenshots)
+**Aurelia** is a modern, feature-rich graphic design editor developed as a browser-based platform for quick creation of visuals such as social media posts, banners and invitations. It combines intuitive user interaction with powerful design tools and AI-powered image generation.
 
 ## Overview
-The **UEvent Frontend** offers a comprehensive and user-friendly interface for event management. It enables organizers to create and manage events, while allowing attendees to discover, register for, and track events they're interested in. The application focuses on delivering a smooth user experience with intuitive event browsing, seamless ticket purchasing, and robust organizer tools.
+The **Aurelia** delivers a robust and accessible interface for creating graphic projects in the browser. It allows users to build visual compositions using a wide set of design elements, modify object styles, draw manually, manage canvas settings, and generate AI-based content. Aurelia was created as part of an academic research project with the goal of combining simplicity, performance, and extensibility for creative users of all skill levels.
 
 ## Features
-- **Event Discovery**: Browse events with filtering and search capabilities
-- **Event Registration**: Purchase tickets with promo code support
-- **Attendee Management**: View and manage event attendees
-- **Event Creation**: Intuitive interface for creating and editing events
-- **Company Profiles**: Organization pages with all their events
-- **Promo Codes**: Create and apply discount codes for events
-- **User Profiles**: Personal dashboards for event management
-- **Responsive Design**: Works on mobile, tablet, and desktop devices
-- **News & Updates**: Event-specific news announcements
-- **Social Features**: View other attendees and manage visibility
+- **Project Management**: Create, rename, duplicate, search, or delete projects. Projects can be saved and reopened later for further editing
+- **Object-Based Editing**: Add and manipulate objects such as shapes, lines, text blocks, and images directly on the canvas
+- **Element Styling**: Customize color, opacity, stroke, and size of shapes. Apply rounded corners and align elements with precision (center, edges, top/bottom)
+- **Image Tools**: Upload your own images or choose from a built-in library and Unsplash integration. Apply filters, rotate, flip, or use an image as the canvas background
+- **Text Editor**: Add text blocks with support for font selection, size, color, alignment, and text decoration (bold, italic, underline, strikethrough)
+- **Drawing Tools**: Freehand draw using brush or erase with an eraser. Control stroke width, color, and transparency
+- **AI Image Generation**: Generate illustrations or textures from text prompts
+- **Undo/Redo System**: Full step-by-step change tracking with ability to navigate through editing history
 
 ## Requirements and Dependencies
 - **Modern Browser**: Chrome, Firefox, Safari, or Edge
 - **Node.js** (v14+ recommended)
 - **Next.js** framework
-- **UEvent Backend API** running and accessible
+- **Aurelia Backend API** running and accessible
 
 ## Setup Instructions
 
-Ensure the UEvent Backend is set up and running before starting the frontend.
+Ensure the Aurelia Backend is set up and running before starting the frontend.
 
 1. **Clone the Repository**:
    ```bash
    git clone [repository-url]
-   cd ucode-connect-Track-FullStack-uevent-frontend
-   cd uevent
+   cd ucode-connect-Track-FullStack-webster-frontend
+   cd webster
    ```
 
 2. **Install Dependencies**:
@@ -58,33 +45,28 @@ Ensure the UEvent Backend is set up and running before starting the frontend.
 
 ## User Interface
 The application features a clean, modern interface with:
-- **Navigation Header**: Access to user profile, events, and search
-- **Event Cards**: Visual representation of events with key information
-- **Event Details**: Comprehensive view of event information
-- **Ticket Purchase Modal**: Streamlined interface for buying tickets
-- **Attendee Display**: View other attendees with privacy controls
-- **Company Profiles**: Dedicated pages for event organizers
-- **User Dashboard**: Personal event management and tickets
+- **Authentication Pages**: Modern registration and login forms with password validation and email verification. Google OAuth support is also integrated
+- **Project Dashboard**: A personal workspace where users can view their saved projects, manage them and create new ones
+- **Canvas Editor Layout**:
+   - **Left Sidebar**: Main tool navigation: edit info, elements, text, images, image filters and paint
+   - **Main Canvas Area**: Interactive stage powered by Konva.js, where all design objects are rendered and manipulated
+   - **Right Sidebar**: Displays a scrollable history timeline
+   - **Header Bar**: Quick access to save/export, undo/redo, zoom controls and share button
+- **Tooltips**: Each feature includes tooltip descriptions
 
 ## State Management
 The frontend uses React Context API for state management:
 - **Auth Context**: User authentication and profile information
-- **Event Context**: Event data, filtering, and management functions
-- **Order Context**: Ticket purchasing and order management
-- **PromoCode Context**: Promo code validation and application
-- **Company Context**: Company information and related events
-- **Notification Context**: System-wide alerts and messages
-- **Subscription Context**: Event subscription management
+- **History Context**: Handles undo/redo logic with change descriptions
 - **Theme Context**: Light/dark mode preferences
 
-## Event Management
-Organizers can manage events through:
-- **Event Creation**: Detailed forms for creating event listings
-- **Ticket Management**: Create and manage ticket types and availability
-- **Attendee Management**: View and manage event participants
-- **News Updates**: Post and manage event-specific announcements
-- **Promo Codes**: Create and distribute discount codes
-- **Event Statistics**: Track registrations and attendance
+## Project Editing
+Users can create, edit, and save graphic design projects. The system supports:
+- Adding and editing shapes, text, and images
+- Adjusting object properties: color, font, opacity, stroke
+- Drawing manually with tools and customizing style
+- Exporting the final image (e.g., PNG)
+- Editing project metadata (name, description, background)
 
 ## Responsive Design
 The application is designed to work across devices:

@@ -30,7 +30,7 @@ export default function MainPage() {
         </div>
         </section>
   
-        <section 
+        {/*<section 
           id="team" 
           className="snap-section">
           <div className="container">
@@ -54,34 +54,9 @@ export default function MainPage() {
               </div>
             </div>
           </div>
-        </section>
-  
-        <section 
-          id="tools" 
-          className="snap-section">
-          <div className="container">
-            <h2>Tools</h2>
-            <div className="flex">
-              <div className="tool-video">
-                <h3>Name</h3>
-                <p>Desc</p>
-                <div className="video-box">Video</div>
-              </div>
-              <div className="tool-video">
-                <h3>Name</h3>
-                <p>Desc</p>
-                <div className="video-box">Video</div>
-              </div>
-              <div className="tool-video">
-                <h3>Name</h3>
-                <p>Desc</p>
-                <div className="video-box">Video</div>
-              </div>
-            </div>
-          </div>
-        </section>
-  
-        <section 
+    </section>*/}
+
+<section 
           id="audience" 
           className="snap-section">
           <div className="container">
@@ -111,6 +86,47 @@ export default function MainPage() {
                   <div className="sphere bottom-sphere"><img style={isDarkMode ? {} : {padding: '5px'}} src={`/images/main/students${isDarkMode ? '': '_white' }.png`} alt=''/></div>
                   <p className="bottom-sphere">Students</p>
                 </div>
+            </div>
+          </div>
+        </section>
+  
+        <section 
+          id="tools" 
+          className="snap-section">
+          <div className="container">
+            <h2>Tools</h2>
+            <div className="flex">
+              <div className="tool-video">
+                <h3>Brush & Eraser</h3>
+                <p>Draw freely or remove parts of your design with fully customizable stroke width, color, and opacity.</p>
+                <div className="video-box">
+                <video autoPlay loop muted>
+                  <source src="/videos/paint.webm" type="video/webm" />
+                </video>
+                </div>
+              </div>
+
+              <div className="tool-row-right">
+                <div className="tool-video">
+                  <h3>Elements</h3>
+                  <p>Add and customize shapes. Move, resize, and align them with ease.</p>
+                  <div className="video-box">
+                    <video autoPlay loop muted>
+                      <source src="/videos/figures.webm" type="video/webm" />
+                    </video>
+                  </div>
+                </div>
+              </div>
+
+              <div className="tool-video">
+                <h3>Images</h3>
+                <p>Upload your own images or explore the integrated gallery. Drag, resize, and edit them on the canvas.</p>
+                <div className="video-box">
+                  <video autoPlay loop muted>
+                    <source src="/videos/images.webm" type="video/webm" />
+                  </video>
+                </div>
+              </div>
             </div>
           </div>
         </section>

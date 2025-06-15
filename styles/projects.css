@@ -139,7 +139,7 @@ a {
     height: 180px;
     overflow: hidden;
     margin-bottom: 6px;
-    box-shadow: 0 0 1px rgba(0, 0, 0, 0.9);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
 }
 
 .project {
@@ -220,20 +220,27 @@ a {
 
 /*Pagination*/
 
+.load-more-wrapper {
+    height: 50px; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 .load-more-btn {
-    background-color: var(--primary-color);
     color: var(--text-color);
-    padding: 10px 16px;
+    padding: 6px 16px;
     font-size: 16px;
-    border: none;
-    border-radius: 5px;
+    border: 2px solid var(--text-color);
+    border-radius: 6px;
     cursor: pointer;
     transition: background-color 0.3s ease;
-  }
+}
   
-  .load-more-btn:hover {
-    background-color: var(--primary-color-dark);
-  }
+.load-more-btn:hover {
+    background-color: var(--text-color);
+    color: var(--try-btn);
+}
 
 .active, .inactive {
     padding: 8px 16px;
@@ -517,6 +524,30 @@ a {
 
 .popup-close-btn:hover {
     color: #f00;
+}
+
+html.dark .ScrollbarsCustom-Thumb {
+    background-color: rgba(255, 255, 255, 0.438) !important;
+}
+  
+html.dark .ScrollbarsCustom-Thumb:hover {
+    background-color: rgba(255, 255, 255, 0.247) !important;
+}
+  
+body.light .ScrollbarsCustom-Thumb {
+    background-color: rgba(0, 0, 0, 0.3) !important;
+}
+  
+body.light .ScrollbarsCustom-Thumb:hover {
+    background-color: rgba(0, 0, 0, 0.6) !important;
+}
+
+body.light .ScrollbarsCustom-Track {
+    background-color: rgba(0, 0, 0, 0.6) !important;
+}
+  
+html.dark .ScrollbarsCustom-Track {
+    background-color: rgba(255, 255, 255, 0.171) !important;
 }
 
 /*Responsive design*/

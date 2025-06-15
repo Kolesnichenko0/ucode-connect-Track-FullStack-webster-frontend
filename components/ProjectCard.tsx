@@ -2,6 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { formatDate } from '../utils/dateUtils';
 import DownloadPreview from './DownloadModal';
+import { toast } from 'react-toastify';
+import toastStyles from './ui/toastStyles';
+import 'react-toastify/dist/ReactToastify.css';
+import { useTheme } from '../contexts/ThemeContext';
 import '../styles/main.css';
 import projectService from '../services/projectService';
 import axios from 'axios';
@@ -9,6 +13,7 @@ import axios from 'axios';
 const ProjectCard = ({ project, onProjectChanged }) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+    const { isDarkMode } = useTheme();
     const [isOpenModal, setIsOpenModal] = useState(false);
     const [showActions, setShowActions] = useState(false);
     const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(null);
@@ -49,8 +54,13 @@ const ProjectCard = ({ project, onProjectChanged }) => {
     }
 
     const copyImg = async () => {
-      await projectService.createProjectCopy(project.id);
+      const copied = await projectService.createProjectCopy(project.id);
       onProjectChanged();
+      if (copied.error) {
+        toast.error(copied.message, toastStyles(isDarkMode, true));
+      } else {
+        toast.success('Project copied successfully',  toastStyles(isDarkMode));
+      }
     }
 
     const redirectMe = async() => {

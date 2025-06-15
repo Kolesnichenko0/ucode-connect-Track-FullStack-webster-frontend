@@ -50,6 +50,7 @@ export default function Canvas({ settings, activeTool, setActiveTool, paintTool,
     width,
     height,
     isTransparent,
+    isTemplate,
     backgroundColor,
     type,
     showGrid,
@@ -194,35 +195,6 @@ export default function Canvas({ settings, activeTool, setActiveTool, paintTool,
     const newX = node.x();
     const newY = node.y();
 
-    /*
-     
-    const updated = objects.map(obj => {
-      if (obj.id === id) {
-        if (obj.type === 'image') {
-          return {
-            ...obj,
-            x: newX,
-            y: newY,
-            width: newWidth,
-            height: newHeight,
-            scaleX: node.scaleX(),
-            scaleY: node.scaleY(),
-          };
-        } else {
-        return {
-          ...obj,
-          x: newX,
-          y: newY,
-          width: newWidth,
-          height: newHeight,
-          scaleX: 1,
-          scaleY: 1,
-        };
-      }
-      }
-      return obj;
-    });*/
-
     node.scaleX(1);
     node.scaleY(1);
 
@@ -240,7 +212,7 @@ export default function Canvas({ settings, activeTool, setActiveTool, paintTool,
     });
     
     setObjects(updated);
-    addHistoryStep('Transformed object' , updated/*objects*/);
+    addHistoryStep('Transformed object' , updated);
   };
 
   const handleExportImg = (format) => {
@@ -480,6 +452,7 @@ export default function Canvas({ settings, activeTool, setActiveTool, paintTool,
             title,
             ...(description && { description }),
             type: type && type.includes('x') ? `${width}x${height}` : type,
+            isTemplate,
             content: {
                 width,
                 height,
@@ -494,23 +467,9 @@ export default function Canvas({ settings, activeTool, setActiveTool, paintTool,
 
         const updated = await projectService.editProject(id, updatedProject);
         if (updated.error) {
-          toast.error(updated.message,  toastStyles(isDarkMode, true)/*{
-            position: 'bottom-right',
-            style: {
-                background: isDarkMode ? '#000000' : '#ffffff',
-                color: isDarkMode ? '#ffffff' : '#000000',
-                border: `1px solid ${isDarkMode ? '#374151' : '#e5e7eb'}`,
-            },
-        }*/);
+          toast.error(updated.message, toastStyles(isDarkMode, true));
         } else {
-          toast.success('Project successfully saved',  toastStyles(isDarkMode)/*{
-          position: 'bottom-right',
-          style: {
-              background: isDarkMode ? '#000000' : '#ffffff',
-              color: isDarkMode ? '#ffffff' : '#000000',
-              border: `1px solid ${isDarkMode ? '#374151' : '#e5e7eb'}`,
-          },
-        }*/);
+          toast.success('Project successfully saved',  toastStyles(isDarkMode));
         }
         
     } catch (error) {
@@ -533,7 +492,7 @@ export default function Canvas({ settings, activeTool, setActiveTool, paintTool,
     const blob = await res.blob();
 
     if (!blob) {
-      alert("Unable to get image to copy");
+      toast.error("Unable to get image to copy", toastStyles(isDarkMode, true));
       return;
     }
 
@@ -542,8 +501,8 @@ export default function Canvas({ settings, activeTool, setActiveTool, paintTool,
         [blob.type]: blob,
       }),
     ]);
-
-    alert("Image copied to clipboard!");
+  
+    toast.success('Copied! Ready to share',  toastStyles(isDarkMode));
   }
 
   useEffect(() => {
@@ -618,7 +577,7 @@ export default function Canvas({ settings, activeTool, setActiveTool, paintTool,
             </div>
 
             <div className="dropdown-option">
-              <TelegramShareButton url={shareTitle} title={`${shareTitle} – See what I created!`}>
+              <TelegramShareButton url={shareTitle}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                   <TelegramIcon size={24} round /> Telegram
                 </div>
@@ -626,7 +585,7 @@ export default function Canvas({ settings, activeTool, setActiveTool, paintTool,
             </div>
 
             <div className="dropdown-option">
-              <TwitterShareButton url={shareTitle} title={`${shareTitle} – See what I created!`}>
+              <TwitterShareButton url={shareTitle}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                   <TwitterIcon size={24} round /> Twitter
                 </div>

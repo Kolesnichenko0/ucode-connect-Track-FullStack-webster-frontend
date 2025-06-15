@@ -3,6 +3,10 @@ import { useRouter } from 'next/router';
 import { HuePicker } from 'react-color';
 import { useAuth } from '../contexts/AuthContext';
 import projectService from '../services/projectService';
+import { toast } from 'react-toastify';
+import toastStyles from './ui/toastStyles';
+import 'react-toastify/dist/ReactToastify.css';
+import { useTheme } from '../contexts/ThemeContext';
 import axios from 'axios';
 
 const templates = {
@@ -27,6 +31,7 @@ const templates = {
 const PopupWindow = ({setIsOpenModal}) => {
     const { user } = useAuth();
     const router = useRouter();
+    const { isDarkMode } = useTheme();
     const [tab, setTab] = useState<'photo' | 'social' | 'web'>('photo');
     const [title, setTitle] = useState('Untitled');
     const [activeTmp, setActiveTmp] = useState('');
@@ -43,6 +48,16 @@ const PopupWindow = ({setIsOpenModal}) => {
     };
 
     const handleCreateProject = async () => {
+      if (!title.trim()) {
+        toast.error('Title is required', toastStyles(isDarkMode, true));
+        return;
+      }
+      
+      if (!Number.isFinite(width) || !Number.isFinite(height) || width < 100 || width > 1600 || height < 100 || height > 1600) {
+        toast.error('Width and height must be between 100 and 1600 px', toastStyles(isDarkMode, true));
+        return;
+      }
+
       try {
         const userId = user?.id;
         const newProject = {
@@ -63,27 +78,33 @@ const PopupWindow = ({setIsOpenModal}) => {
         };
         
         const createdProject = await projectService.createProject(newProject);
-        console.log('Created project:', createdProject);
+        if (!createdProject?.id) {
+          toast.error(createdProject.message || 'Could not create project', toastStyles(isDarkMode, true));
+          return;
+        } else {
+          toast.success('Project successfully created',  toastStyles(isDarkMode));
 
-        router.push({
-          pathname: `/editor/[id]`,
-          query: {
-            id: createdProject.id,
-            new: 'true',
-          },
-        });
-
-        setIsOpenModal(false);
-        localStorage.removeItem('canvas-objects');
-        localStorage.removeItem('canvas-history');
-        localStorage.removeItem('canvas-history-step');
+          router.push({
+            pathname: `/editor/[id]`,
+            query: {
+              id: createdProject.id,
+              new: 'true',
+            },
+          });
+  
+          setIsOpenModal(false);
+          localStorage.removeItem('canvas-objects');
+          localStorage.removeItem('canvas-history');
+          localStorage.removeItem('canvas-history-step');
+        }
       } catch (error: unknown) {
         if (axios.isAxiosError(error)) { 
-          console.log('Error response from server:', error.response?.data);
+          const message = error.response?.data?.message || 'Something went wrong while creating the project';
+          toast.error(message, toastStyles(isDarkMode, true));;
         } else if (error instanceof Error) { 
-          console.log('General error:', error.message);
+          toast.error(error.message, toastStyles(isDarkMode, true));
         } else {
-          console.log('Unknown error:', error);
+          toast.error('Unknown error occurred', toastStyles(isDarkMode, true));
         }
       }
     };
@@ -134,11 +155,11 @@ const PopupWindow = ({setIsOpenModal}) => {
             <div className='size-settings'>
               <div>
                 <label className='popup-label'>Height (in px)</label>
-                <input id='height-input' value={height} onChange={(e) => setHeight(Number(e.target.value))} type='number' className='popup-input' min='100' max='1080' placeholder='1080' required></input>
+                <input id='height-input' value={height} onChange={(e) => setHeight(Number(e.target.value))} type='number' className='popup-input' min='100' max='1600' placeholder='1080' required></input>
               </div>
               <div>
                 <label id='width-label' className='popup-label wh-input'>Width (in px)</label>
-                <input id='width-input' value={width} onChange={(e) => setWidth(Number(e.target.value))} type='number' className='popup-input' min='100' max='1200'  placeholder='1080' required></input>
+                <input id='width-input' value={width} onChange={(e) => setWidth(Number(e.target.value))} type='number' className='popup-input' min='100' max='1600'  placeholder='1080' required></input>
               </div>
             </div>
                         

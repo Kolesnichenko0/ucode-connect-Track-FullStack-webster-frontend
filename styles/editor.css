@@ -370,6 +370,12 @@
     max-height: 695px;
   }
 
+  .unsplash-list .img-panel-image {
+    width: 225px;
+    height: 190px;
+    padding-right: 4px;
+  }
+
   .image-list .img-panel-image {
     margin-top: 15px;
   }

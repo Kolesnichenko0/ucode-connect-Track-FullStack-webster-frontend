@@ -27,6 +27,7 @@ const projectService = {
       params['after[updatedAt]'] = cursor.updatedAt;
       params['after[id]'] = cursor.id;
     }
+    params.isTemplate = false;
     const res = await axios.get(`${API_URL}/users/${id}/projects`, {
       params,
       withCredentials: true,

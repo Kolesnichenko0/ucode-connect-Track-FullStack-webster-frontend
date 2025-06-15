@@ -141,6 +141,11 @@ export default function MyProjects() {
                     Your projects
                 </motion.h2>   
                 {projects.length > 0 ? (<>
+                <motion.div
+                    initial={{ opacity: 0, y: 50 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.8, delay: 1.2 }}
+                >
                 <Scrollbar className='projects-scroll' style={{ height: projects.length > 0 ? (projects.length > 5 ? 508 : 290) : 'auto', width: 1365, margin: 'auto', marginTop: 40 }} noScrollX>
                     <motion.div 
                     initial={{ opacity: 0, y: 50 }}
@@ -153,16 +158,19 @@ export default function MyProjects() {
                         
                     </motion.div>
                 </Scrollbar>
-                {hasMore && (
-                    <div style={{ textAlign: 'center', marginTop: 10 }}>
-                        <button
-                            className="load-more-btn"
-                            onClick={loadMore}
-                        >
-                            Show more
-                        </button>
-                    </div>
-                )}
+                </motion.div>
+                <div className="load-more-wrapper">
+                    {hasMore && (
+                        <div style={{ textAlign: 'center', marginTop: 10 }}>
+                            <button
+                                className="load-more-btn"
+                                onClick={loadMore}
+                            >
+                                Show more
+                            </button>
+                        </div>
+                    )}
+                </div>
                 </>) : (
                     <motion.div 
                     initial={{ opacity: 0, y: 50 }}

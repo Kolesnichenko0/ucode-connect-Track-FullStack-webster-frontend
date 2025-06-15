@@ -1,5 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import imagesService from '../services/imagesService';
+import { toast } from 'react-toastify';
+import toastStyles from './ui/toastStyles';
+import 'react-toastify/dist/ReactToastify.css';
+import { useTheme } from '../contexts/ThemeContext';
 import { useRouter } from 'next/router';
 
 type UploadedImage = {
@@ -10,6 +14,7 @@ type UploadedImage = {
 
 export default function ImagesPanel({projectId}) {
     const router = useRouter();
+    const { isDarkMode } = useTheme();
     const [activeTab, setActiveTab] = useState('library');
     const [searchedTitle, setSearchedTitle] = useState('');
     const [bgImages, setBgImages] = useState<string[]>([]);
@@ -118,10 +123,11 @@ export default function ImagesPanel({projectId}) {
                 url: localBlobUrl,
                 fileKey: uploaded.fileKey,
                 originalUrl: imageUrl,
-            }
+          }
         ]);
+        toast.success('Image uploaded! You can now drag it onto the canvas',  toastStyles(isDarkMode));
         } catch (err) {
-          console.error('Failed to add Unsplash image:', err);
+          toast.error('Unable to load image. Try again', toastStyles(isDarkMode, true));
         }
     };
 
@@ -166,8 +172,15 @@ export default function ImagesPanel({projectId}) {
                                     key={`unsplash-${index}`}
                                     className='img-panel-image'
                                     src={src}
-                                    draggable={isAdded}
-                                    onDragStart={isAdded ? (e) => e.dataTransfer.setData('image-src', src) : undefined}
+                                    draggable={true}
+                                    onDragStart={(e) => {
+                                      if (isAdded) {
+                                        e.dataTransfer.setData('image-src', src);
+                                      } else {
+                                        e.preventDefault();
+                                        toast.error('This image has not been added yet! Press + first', toastStyles(isDarkMode, true));
+                                      }
+                                    }}
                                 />
                                 {!isAdded &&
                                     <img className='img-add' src='/images/plus.png' onClick={() => addUnsplashImageToProject(src)} alt=''/>

@@ -6,7 +6,7 @@ import '../styles/main.css';
 import projectService from '../services/projectService';
 import axios from 'axios';
 
-const ProjectCard = ({ project }) => {
+const ProjectCard = ({ project, onProjectChanged }) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [isOpenModal, setIsOpenModal] = useState(false);
@@ -44,11 +44,13 @@ const ProjectCard = ({ project }) => {
       const isConfirmed = window.confirm('Are you sure you want to delete this project?');
       if (isConfirmed) {
         await projectService.deleteProject(project.id);
+        onProjectChanged();
       }
     }
 
-    const shareProject = async () => {
-      
+    const copyImg = async () => {
+      await projectService.createProjectCopy(project.id);
+      onProjectChanged();
     }
 
     const redirectMe = async() => {
@@ -80,17 +82,17 @@ const ProjectCard = ({ project }) => {
           {showActions && (
           <div className='project-actions' onClick={(e) => e.stopPropagation()}>
             <div className='option-block'>
+                <img className='option' id='edit-img' src='/images/copy-icon.png' onClick={() => {
+                    copyImg();
+                }}></img>
+            </div>
+            <div className='option-block'>
                 <img className='option' id='edit-img' src='/images/edit-icon.png' onClick={() => {
                     redirectMe();
                 }}></img>
             </div>
             <div className='option-block'>
                 <img className='option' id='del-img' src='/images/delete-icon.png' onClick={() => deleteProject()}></img>
-            </div>
-            <div className='option-block'>
-                <img className='option' id='share-img' src='/images/share-icon.png' onClick={() => {
-                    shareProject();
-                }}></img>
             </div>
           </div>
         )}

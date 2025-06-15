@@ -103,6 +103,16 @@
     padding: 10px;
     border-top: 1px solid #ccc;
   }
+
+  .share-dropdown-menu {
+    width: 145px !important;
+    right: -120px !important;
+  }
+
+  .Toastify__close-button {
+    color: #9ca3af !important; 
+    opacity: 0.8;
+  }
  
   .grid {
     display: grid;
@@ -314,6 +324,7 @@
     margin-top: 20px;
     margin-bottom: 20px;
     position: relative;
+    color: black;
   } 
   
   .active-img-tab {
@@ -321,6 +332,50 @@
     text-decoration: underline;
     text-underline-offset: 10px;
     color: var(--text-color);
+  }
+
+  .elements-section {
+    margin-top: 15px;
+  }
+
+  .uploaded-img {
+    position: relative;
+    display: inline-block;
+  }
+
+  .img-del, .img-add {
+    position: absolute;
+    width: 25px;
+    right: 6px;
+    top: 25px;
+    background-color: white;
+    border: 0.5px solid black;
+    border-radius: 6px;
+    padding: 2.2px;
+    opacity: 0;
+  }
+
+  .uploaded-img:hover .img-del, 
+  .uploaded-img:hover .img-add {
+    opacity: 1;
+  }
+
+  .image-list {
+    max-height: 335px;
+    overflow-y: scroll;
+    scrollbar-width: none;
+  }
+
+  .unsplash-list {
+    max-height: 695px;
+  }
+
+  .image-list .img-panel-image {
+    margin-top: 15px;
+  }
+
+  .elements-section .img-panel-image{
+    object-fit: contain;
   }
   
   .search {
@@ -337,6 +392,10 @@
     top: 7px;
   }
 
+  .library-section h4 {
+    font-size: 15px;
+  }
+
   .tabs {
     display: flex;
     justify-content: space-between;
@@ -351,7 +410,7 @@
 
   .uploaded-images {
     margin-top: 15px;
-    max-height: 647px;
+    max-height: 730px;
     overflow-y: scroll;
     scrollbar-width: none;
   }

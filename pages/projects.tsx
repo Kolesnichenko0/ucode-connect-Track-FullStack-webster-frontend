@@ -16,26 +16,63 @@ export default function MyProjects() {
     const [recentProjects, setRecentProjects] = useState<Project[]>([]);
     const [templates, setTemplates] = useState<Project[]>([]);
     const [searchedTitle, setSearchedTitle] = useState('');
-    const [currentPage, setCurrentPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(1);
+    const [totalProjects, setTotalProjects] = useState(0);
+    const [cursor, setCursor] = useState<{ updatedAt: string; id: number } | null>(null);
+    const [hasMore, setHasMore] = useState(false);
     const { user } = useAuth(); 
 
     useEffect(() => {
-       fetchProjects();
+        setCursor(null);
+       fetchProjects(true);
     }, [searchedTitle]);
-    
 
-    const fetchProjects = async() => {
+    useEffect(() => {
+        fetchRecentProjects();
+        fetchTemplates();
+     }, []);
+
+    const refreshProjects = async () => {
+        setProjects([]);
+        setCursor(null);
+        await fetchProjects(true);
+        await fetchRecentProjects();
+    };
+
+    const fetchProjects = async(reset = false) => {
         setLoading(true);
 
         try {
-            const resp = await projectService.getProjects(Number(user?.id), searchedTitle);
-            setProjects(resp.items);
-            const recent = await projectService.getRecentProjects(Number(user?.id), searchedTitle);
-            setRecentProjects(recent.items);
+            const resp = await projectService.getProjects(Number(user?.id), searchedTitle, reset ? null : cursor);
+            setTotalProjects(resp.total);
+            setHasMore(resp.hasMore);
+            if (reset) {
+                setProjects(resp.items);
+              } else {
+                setProjects(prev => [...prev, ...resp.items]);
+              }
+
+              const last = resp.items?.[resp.items.length - 1];
+              if (last) {
+                setCursor({ updatedAt: last.updatedAt, id: last.id });
+              }
+        } catch (err: any) {
+            setError(err);
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    const fetchRecentProjects = async () => {
+        const recent = await projectService.getRecentProjects(Number(user?.id), searchedTitle);
+        setRecentProjects(recent.items)
+    }
+
+    const fetchTemplates = async() => {
+        setLoading(true);
+
+        try {
             const tmps = await projectService.getTemplates();
             setTemplates(tmps.items);
-            /*setTotalPages(Math.ceil(resp.data.total / resp.data.limit));*/
         } catch (err: any) {
             setError(err);
         } finally {
@@ -45,7 +82,12 @@ export default function MyProjects() {
 
     const handleSearch = (e) => {
         setSearchedTitle(e.target.value);
-        fetchProjects();
+    };
+
+    const loadMore = () => {
+        if (hasMore) {
+            fetchProjects(false);
+        }
     };
 
     return (<>
@@ -84,7 +126,7 @@ export default function MyProjects() {
                     className='tmp-projects-part'>
                     {
                         templates.map((tmp) => (
-                            <ProjectCard key={tmp.id} project={tmp}/> 
+                            <ProjectCard key={tmp.id} project={tmp} onProjectChanged={refreshProjects}/> 
                         ))
                     } 
                     </motion.div>
@@ -98,7 +140,7 @@ export default function MyProjects() {
                 id='projects-title'>
                     Your projects
                 </motion.h2>   
-                {projects.length > 0 ? (
+                {projects.length > 0 ? (<>
                 <Scrollbar className='projects-scroll' style={{ height: projects.length > 0 ? (projects.length > 5 ? 508 : 290) : 'auto', width: 1365, margin: 'auto', marginTop: 40 }} noScrollX>
                     <motion.div 
                     initial={{ opacity: 0, y: 50 }}
@@ -106,11 +148,22 @@ export default function MyProjects() {
                     transition={{ duration: 0.8, delay: 0.6 }}
                     className='all-projects-part'>  
                         {projects.map((project) => (
-                            <ProjectCard key={project.id} project={project}/>
+                            <ProjectCard key={project.id} project={project} onProjectChanged={refreshProjects} />
                         ))}
+                        
                     </motion.div>
                 </Scrollbar>
-                ) : (
+                {hasMore && (
+                    <div style={{ textAlign: 'center', marginTop: 10 }}>
+                        <button
+                            className="load-more-btn"
+                            onClick={loadMore}
+                        >
+                            Show more
+                        </button>
+                    </div>
+                )}
+                </>) : (
                     <motion.div 
                     initial={{ opacity: 0, y: 50 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -143,7 +196,7 @@ export default function MyProjects() {
                         className='recent-projects-part'>
                             {
                                 recentProjects.map((r) => (
-                                    <ProjectCard key={r.id} project={r}/> 
+                                    <ProjectCard key={r.id} project={r} onProjectChanged={refreshProjects}/> 
                                 ))
                             } 
                     </motion.div>

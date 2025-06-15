@@ -20,9 +20,15 @@ export interface Project {
 }
 
 const projectService = {
-  getProjects: async (id: number, title: string = '') => {
+  getProjects: async (id: number, title: string = '', cursor: { updatedAt: string; id: number } | null = null) => {
+    const params: any = {};
+    if (title !== '') params.title = title;
+    if (cursor) {
+      params['after[updatedAt]'] = cursor.updatedAt;
+      params['after[id]'] = cursor.id;
+    }
     const res = await axios.get(`${API_URL}/users/${id}/projects`, {
-      params: { ...(title !== '' && { title }) },
+      params,
       withCredentials: true,
     });
     return res.data;
@@ -91,6 +97,16 @@ const projectService = {
       return res.data;
     } catch (error) {
       console.error('Error creating project:', error);
+      throw error;
+    }
+  },
+
+  createProjectCopy: async (id: number) => {
+    try {
+      const res = await axios.post(`${API_URL}/projects/${id}/copy`);
+      return res.data;
+    } catch (error) {
+      console.error('Error creating project copy:', error);
       throw error;
     }
   },

@@ -43,30 +43,30 @@ export default function ImagesPanel({projectId}) {
         }
     };
 
+    const fetchUploaded = async () => {
+      const id = projectId;
+      if (!id) return;
+      try {
+        const files = await imagesService.getAllProjectFiles(id);
+
+        const blobUrls: UploadedImage[] = await Promise.all(
+            files.map(async (file) => {
+              const previewUrl = file.previewUrl || file.url || file.fileKey;
+              const blobUrl = previewUrl ? await imagesService.getBlobPreviewUrl(previewUrl) : '';
+              return {
+                url: blobUrl,
+                fileKey: file.fileKey,
+              };
+            })
+          );
+
+        setUploadedImages(blobUrls);
+      } catch (err) {
+        console.error('Failed to fetch project files:', err);
+      }
+    };
+
     useEffect(() => {
-        const fetchUploaded = async () => {
-          const id = projectId;
-          if (!id) return;
-          try {
-            const files = await imagesService.getAllProjectFiles(id);
-
-            const blobUrls: UploadedImage[] = await Promise.all(
-                files.map(async (file) => {
-                  const previewUrl = file.previewUrl || file.url || file.fileKey;
-                  const blobUrl = previewUrl ? await imagesService.getBlobPreviewUrl(previewUrl) : '';
-                  return {
-                    url: blobUrl,
-                    fileKey: file.fileKey,
-                  };
-                })
-              );
-
-            setUploadedImages(blobUrls);
-          } catch (err) {
-            console.error('Failed to fetch project files:', err);
-          }
-        };
-      
         fetchUploaded();
       }, [projectId]);
 
@@ -80,7 +80,7 @@ export default function ImagesPanel({projectId}) {
 
         const localPreviews = Array.from(files).map(file => ({
             url: URL.createObjectURL(file),
-            fileKey: ''
+            fileKey: '',
         }));
         setUploadedImages((prev) => [...prev, ...localPreviews]);
 
@@ -93,7 +93,7 @@ export default function ImagesPanel({projectId}) {
                 const previewUrl = file.previewUrl || file.url || file.fileKey;
                 if (!previewUrl) return;
           
-                await new Promise(res => setTimeout(res, 700));
+                await new Promise(res => setTimeout(res, 200));
           
                 const blobUrl = await imagesService.getBlobPreviewUrl(previewUrl);
                 setUploadedImages(prev => {
@@ -104,7 +104,7 @@ export default function ImagesPanel({projectId}) {
                   updated[idx] = { url: blobUrl, fileKey: file.fileKey };
                   return updated;
                 });
-              });
+            });
           } catch (error) {
             console.error('Upload failed:', error);
           }
@@ -245,7 +245,9 @@ export default function ImagesPanel({projectId}) {
                                 e.dataTransfer.setData('image-src', url);
                             }}
                         />
-                        <img className='img-del' src='/images/delete-icon.png' onClick={() => rmFileFromProject(fileKey)} alt=''/>
+                        {fileKey &&
+                          <img className='img-del' src='/images/delete-icon.png' onClick={() => rmFileFromProject(fileKey)} alt=''/>
+                        }
                     </div>
                 </>))}
             </div>

@@ -7,6 +7,8 @@ import ProjectCard from '../components/ProjectCard';
 import PopupWindow from '../components/PopupWindow'
 import { useAuth } from '../contexts/AuthContext';
 import { Project } from '../services/projectService';
+import { useSearchParams } from 'next/navigation';
+import router from 'next/router';
 
 export default function MyProjects() {
     const [loading, setLoading] = useState(true);
@@ -17,9 +19,28 @@ export default function MyProjects() {
     const [templates, setTemplates] = useState<Project[]>([]);
     const [searchedTitle, setSearchedTitle] = useState('');
     const [totalProjects, setTotalProjects] = useState(0);
+    const [userTemplates, setUserTemplates] = useState<Project[]>([]);
+    const [userTemplatesCursor, setUserTemplatesCursor] = useState<{ updatedAt: string; id: number } | null>(null);
+    const [userTemplatesHasMore, setUserTemplatesHasMore] = useState(false);
+    const [userTemplatesLoading, setUserTemplatesLoading] = useState(false);
     const [cursor, setCursor] = useState<{ updatedAt: string; id: number } | null>(null);
     const [hasMore, setHasMore] = useState(false);
+    const searchParams = useSearchParams();
     const { user } = useAuth(); 
+
+    useEffect(() => {
+        if (!router.isReady) {
+            return;
+          }
+        const accessToken = searchParams.get("accessToken");
+        const refreshToken = searchParams.get("refreshToken");
+    
+        if (accessToken && refreshToken) {
+          sessionStorage.setItem("accessToken", accessToken);
+          localStorage.setItem("refreshToken", refreshToken);
+          router.replace("/projects");
+        } 
+    }, [router.isReady, searchParams]);
 
     useEffect(() => {
         setCursor(null);
@@ -29,6 +50,7 @@ export default function MyProjects() {
     useEffect(() => {
         fetchRecentProjects();
         fetchTemplates();
+        fetchUserTemplates(true);
      }, []);
 
     const refreshProjects = async () => {
@@ -80,6 +102,27 @@ export default function MyProjects() {
         }
     }
 
+    const fetchUserTemplates = async (reset = false) => {
+        setUserTemplatesLoading(true);
+        try {
+          const resp = await projectService.getUserTemplates(Number(user?.id), reset ? null : userTemplatesCursor);
+          if (reset) {
+            setUserTemplates(resp.items);
+          } else {
+            setUserTemplates(prev => [...prev, ...resp.items]);
+          }
+          setUserTemplatesHasMore(resp.hasMore);
+          const last = resp.items?.[resp.items.length - 1];
+          if (last) {
+            setUserTemplatesCursor({ updatedAt: last.updatedAt, id: last.id });
+          }
+        } catch (err: any) {
+          setError(err.message || 'Error loading user templates');
+        } finally {
+          setUserTemplatesLoading(false);
+        }
+      };
+
     const handleSearch = (e) => {
         setSearchedTitle(e.target.value);
     };
@@ -114,11 +157,12 @@ export default function MyProjects() {
                 <motion.h2
                     initial={{ opacity: 0, y: 50 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8, delay: 0 }}className='section-title'>
+                    transition={{ duration: 0.8, delay: 0 }}
+                    className='section-title'>
                         Templates
                 </motion.h2>
                 
-                <Scrollbar className='tmp-scroll' style={{ height: 300, width: 1365, margin: 'auto', marginTop: 40, overflowY: 'auto' }} noScrollX>
+                <Scrollbar className='tmp-scroll' style={{ height: 300, width: 1365, margin: 'auto', marginTop: 40 }} noScrollX>
                     <motion.div
                     initial={{ opacity: 0, y: 50 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -127,8 +171,18 @@ export default function MyProjects() {
                     {
                         templates.map((tmp) => (
                             <ProjectCard key={tmp.id} project={tmp} onProjectChanged={refreshProjects}/> 
-                        ))
+                        ))      
                     } 
+                    {
+                        userTemplates.map(t => <ProjectCard key={t.id} project={t} onProjectChanged={refreshProjects}/>)
+                    }
+                    {userTemplatesHasMore && (
+                        <div style={{ textAlign: 'center', marginTop: 10 }}>
+                            <button onClick={() => fetchUserTemplates(false)} disabled={userTemplatesLoading}>
+                            {userTemplatesLoading ? 'Loading...' : 'Show more'}
+                            </button>
+                        </div>
+                    )}
                     </motion.div>
                 </Scrollbar>
 

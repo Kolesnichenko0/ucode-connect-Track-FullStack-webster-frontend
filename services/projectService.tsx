@@ -48,6 +48,20 @@ const projectService = {
     return res.data;
   },
 
+  getUserTemplates: async (id: number, cursor: { updatedAt: string; id: number } | null = null) => {
+    const params: any = {};
+    if (cursor) {
+      params['after[updatedAt]'] = cursor.updatedAt;
+      params['after[id]'] = cursor.id;
+    }
+    const res = await axios.get(`${API_URL}/users/${id}/projects`, {
+      params: {
+        isTemplate: true,
+      },
+    });
+    return res.data;
+  },
+
   getProject: async (id: number) => {
     try {
       const res = await axios.get(`${API_URL}/projects/${id}`, {withCredentials: true});

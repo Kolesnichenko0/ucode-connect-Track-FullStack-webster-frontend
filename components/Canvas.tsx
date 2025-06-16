@@ -119,18 +119,44 @@ export default function Canvas({ settings, activeTool, setActiveTool, paintTool,
   const handleDragStart = (id, e) => {
     const baseId = id.replace('-rect', '');
 
-    const textObj = objects.find((obj) => obj.id === baseId);
-    const rectObj = objects.find((obj) => obj.id === `${baseId}-rect`);
+    const isPairedText = objects.some(obj => obj.id === baseId) &&
+                        objects.some(obj => obj.id === `${baseId}-rect`);
 
-    if (!textObj || !rectObj) return;
+    if (isPairedText) {
+      const rectNode = shapeRefs.current[`${baseId}-rect`];
+      const textNode = shapeRefs.current[baseId];
+      if (rectNode && textNode) {
+        rectNode.moveToTop();
+        textNode.moveToTop();
+      }
+    } else {
+      const targetNode = shapeRefs.current[id];
+      if (targetNode) {
+        targetNode.moveToTop();
+      }
+    }
 
-    const objectsCopy = objects.filter(
-      (obj) => obj.id !== baseId && obj.id !== `${baseId}-rect`
-    );
+    const objectsCopy = objects.slice();
 
-    objectsCopy.push(rectObj, textObj);
-    setObjects(objectsCopy);
-    addHistoryStep('Moved object' , objectsCopy);
+    if (isPairedText) {
+      const rectObj = objectsCopy.find(obj => obj.id === `${baseId}-rect`);
+      const textObj = objectsCopy.find(obj => obj.id === baseId);
+
+      const filtered = objectsCopy.filter(obj => obj.id !== baseId && obj.id !== `${baseId}-rect`);
+      filtered.push(rectObj, textObj);
+
+      setObjects(filtered);
+      addHistoryStep('Moved paired object', filtered);
+    } else {
+      const targetObj = objectsCopy.find(obj => obj.id === id);
+      if (!targetObj) return;
+
+      const filtered = objectsCopy.filter(obj => obj.id !== id);
+      filtered.push(targetObj);
+
+      setObjects(filtered);
+      addHistoryStep('Moved object', filtered);
+    }
   }
 
   const handleDragMove = (id: string, e: any) => {

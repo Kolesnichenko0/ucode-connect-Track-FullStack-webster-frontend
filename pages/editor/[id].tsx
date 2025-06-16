@@ -231,9 +231,6 @@ const [settings, setSettings] = useState(() => {
           <Tooltip title="AI Image Generator" description="🤖 Describe your idea — and AI will draw it for you!" image={`/images/tooltip/ai-panel.jpg`}>
             <button id='ai-btn'><img id='ai-icon' src={`/images/editor/ai${isDarkMode? '_white': ''}.png`} alt='AI' onClick={() => {handleLeftTabClick('ai')}}/></button>
           </Tooltip>
-          {/*<Tooltip title="Instruction" description="📖 Don't know where to start? Everything is explained here!" image={`/images/tooltip/instruction-panel.png`}>
-            <button id='instruction-btn'><img id='instruction-icon' src={`/images/editor/instruction${isDarkMode? '_white': ''}.png`} alt='Instruction' onClick={() => {handleLeftTabClick('instruction')}}/></button>
-  </Tooltip>*/}
         </div>
         
       </div>
@@ -264,7 +261,7 @@ const [settings, setSettings] = useState(() => {
           <PaintPanel paintTool={paintTool} setPaintTool={setPaintTool} paintSettings={paintSettings} setPaintSettings={setPaintSettings}/>
         }
         {activeLeftTab === 'ai' &&
-          <AIPanel/>
+          <AIPanel projectId={settings?.id}/>
         }
       </div>
       }

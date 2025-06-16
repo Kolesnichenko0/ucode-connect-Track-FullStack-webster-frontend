@@ -173,7 +173,7 @@ export default function Register() {
                 <>
                   <div className="mb-8">
                     <h1 className="text-3xl font-bold mb-2">Create an account</h1>
-                    <p className="text-gray-500 dark:text-gray-400">Join GraphiCraft to unlock your creative potential</p>
+                    <p className="text-gray-500 dark:text-gray-400">Join Aurelia to unlock your creative potential</p>
                   </div>
 
                   {statusMessage.message && (
@@ -379,6 +379,7 @@ export default function Register() {
                     </button>
                     <span className='w-full h-1 text-center flex items-center justify-center'>Or</span>
                     <button
+                      onClick={() => window.location.href = 'http://localhost:8080/api/auth/google'}
                       style={{ backgroundColor: isDarkMode ? 'black' : 'white',
                         border: `1px solid ${isDarkMode ? 'white' : 'black'}`,
                        }}

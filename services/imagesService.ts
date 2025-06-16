@@ -86,6 +86,15 @@ const imagesService = {
       return res.data.results;
     },
 
+    generateImage: async (prompt: string = '') => {
+      const body = prompt ? { prompt } : {};
+
+      const res = await axios.post(`${API_URL}/photos/pollinations/generate`, body, {
+        responseType: 'blob', 
+      });
+      return res.data;
+    }
+
   };
   
   export default imagesService;

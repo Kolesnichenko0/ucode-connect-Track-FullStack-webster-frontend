@@ -211,6 +211,7 @@ export default function Login() {
                 </button>
                 <span className='w-full h-1 text-center flex items-center justify-center'>Or</span>
                 <button
+                  onClick={() => window.location.href = 'http://localhost:8080/api/auth/google'}
                   style={{ backgroundColor: isDarkMode ? 'black' : 'white',
                         border: `1px solid ${isDarkMode ? 'white' : 'black'}`,
                   }}

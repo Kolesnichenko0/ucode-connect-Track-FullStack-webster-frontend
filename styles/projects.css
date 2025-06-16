@@ -201,6 +201,10 @@ a {
     z-index: 2;
 }
 
+.project-actions.small-actions {
+    height: 40px;
+}
+
 .project-actions img {
     z-index: 3;
 }
@@ -221,7 +225,7 @@ a {
 /*Pagination*/
 
 .load-more-wrapper {
-    height: 50px; 
+    /*height: 50px; */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -577,9 +581,9 @@ html.dark .ScrollbarsCustom-Track {
         height: 250px !important;
     }
 
-    .projects-scroll {
+    /*.projects-scroll {
         height: 500px !important;
-    }
+    }*/
 }
 
 @media (max-width: 1100px) {

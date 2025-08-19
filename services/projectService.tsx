@@ -1,6 +1,5 @@
 import axios from 'axios';
-
-const API_URL = 'http://localhost:8080/api';
+import {getApiUrl} from "../utils/urls";
 
 export interface Project {
   id: number;
@@ -28,7 +27,7 @@ const projectService = {
       params['after[id]'] = cursor.id;
     }
     params.isTemplate = false;
-    const res = await axios.get(`${API_URL}/users/${id}/projects`, {
+    const res = await axios.get(`${getApiUrl()}/users/${id}/projects`, {
       params,
       withCredentials: true,
     });
@@ -36,7 +35,7 @@ const projectService = {
   },
 
   getRecentProjects: async (id: number, title: string = '') => {
-    const res = await axios.get(`${API_URL}/users/${id}/projects`, {
+    const res = await axios.get(`${getApiUrl()}/users/${id}/projects`, {
       params: { ...(title !== '' && { title }), limit: 5},
       withCredentials: true,
     });
@@ -44,7 +43,7 @@ const projectService = {
   },
 
   getTemplates: async () => {
-    const res = await axios.get(`${API_URL}/projects/templates`);
+    const res = await axios.get(`${getApiUrl()}/projects/templates`);
     return res.data;
   },
 
@@ -54,7 +53,7 @@ const projectService = {
       params['after[updatedAt]'] = cursor.updatedAt;
       params['after[id]'] = cursor.id;
     }
-    const res = await axios.get(`${API_URL}/users/${id}/projects`, {
+    const res = await axios.get(`${getApiUrl()}/users/${id}/projects`, {
       params: {
         isTemplate: true,
       },
@@ -64,7 +63,7 @@ const projectService = {
 
   getProject: async (id: number) => {
     try {
-      const res = await axios.get(`${API_URL}/projects/${id}`, {withCredentials: true});
+      const res = await axios.get(`${getApiUrl()}/projects/${id}`, {withCredentials: true});
       return res.data;
     } catch (error) {
       console.error(`Error fetching project with id ${id}:`, error);
@@ -74,7 +73,7 @@ const projectService = {
 
   /*getThumbnail: async (id: number, key: number) => {
     try {
-      const res = await axios.get(`${API_URL}/files/${id}`);
+      const res = await axios.get(`${getApiUrl()}/files/${id}`);
       const fileKey = res.data.files.filter((o) => o.id === key).fileKey;
       const resp = await projectService.getFileByFileKey(fileKey);
       return resp.data;
@@ -86,7 +85,7 @@ const projectService = {
 
   getFileByFileKey: async (key: number) => {
     try {
-      const res = await axios.get(`${API_URL}/files/${key}`, {
+      const res = await axios.get(`${getApiUrl()}/files/${key}`, {
         withCredentials: true,
       });
       return res.data;
@@ -98,7 +97,7 @@ const projectService = {
 
   editProject: async (id: number, data: Partial<Project>) => {
     try {
-      const res = await axios.patch(`${API_URL}/projects/${id}`, data);
+      const res = await axios.patch(`${getApiUrl()}/projects/${id}`, data);
       return res.data;
     } catch (error) {
       console.error(`Error editing project with id ${id}:`, error);
@@ -108,7 +107,7 @@ const projectService = {
 
   createProject:  async (data: Partial<Project>) => {
     try {
-      const res = await axios.post(`${API_URL}/projects`, data);
+      const res = await axios.post(`${getApiUrl()}/projects`, data);
       return res.data;
     } catch (error) {
       console.error('Error creating project:', error);
@@ -118,7 +117,7 @@ const projectService = {
 
   createProjectCopy: async (id: number) => {
     try {
-      const res = await axios.post(`${API_URL}/projects/${id}/copy`);
+      const res = await axios.post(`${getApiUrl()}/projects/${id}/copy`);
       return res.data;
     } catch (error) {
       console.error('Error creating project copy:', error);
@@ -128,7 +127,7 @@ const projectService = {
 
   deleteProject: async (id: number) => {
     try {
-      const res = await axios.delete(`${API_URL}/projects/${id}`);
+      const res = await axios.delete(`${getApiUrl()}/projects/${id}`);
       return res.data;
     } catch (error) {
       console.error(`Error deleting project with id ${id}:`, error);

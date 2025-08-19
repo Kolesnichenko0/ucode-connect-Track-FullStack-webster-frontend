@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import axios from 'axios';
 import authService from '../services/authService';
 import userService from '../services/userService';
+import {getAssetsUrl} from "../utils/urls";
 
 export interface User {
   id: string;
@@ -40,7 +41,7 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const DEFAULT_AVATAR_URL = 'http://localhost:8080/assets/images/user-avatars/default-user-avatar.png';
+export const DEFAULT_AVATAR_URL = `${getAssetsUrl()}/images/user-avatars/default-user-avatar.png`;
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);

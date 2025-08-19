@@ -1,11 +1,10 @@
 import axios from 'axios';
-
-const API_URL = 'http://localhost:8080/api';
+import {getApiUrl} from "../utils/urls";
 
 const imagesService = {
     getProjectBackgrounds: async () => {
       try {
-        const res = await axios.get(`${API_URL}/files/default/project-backgrounds`);
+        const res = await axios.get(`${getApiUrl()}/files/default/project-backgrounds`);
         return res.data;
       } catch (error) {
         console.error(`Error fetching project backgrounds:`, error);
@@ -15,7 +14,7 @@ const imagesService = {
 
     getProjectElements: async () => {
         try {
-          const res = await axios.get(`${API_URL}/files/default/project-elements`);
+          const res = await axios.get(`${getApiUrl()}/files/default/project-elements`);
           return res.data;
         } catch (error) {
           console.error(`Error fetching project elements:`, error);
@@ -25,7 +24,7 @@ const imagesService = {
 
     getProjectAssets: async () => {
         try {
-          const res = await axios.get(`${API_URL}/files/default/project-assets`);
+          const res = await axios.get(`${getApiUrl()}/files/default/project-assets`);
           return res.data;
         } catch (error) {
           console.error(`Error fetching project assets:`, error);
@@ -35,7 +34,7 @@ const imagesService = {
 
     getAllProjectFiles: async (id: number) => {
         try {
-          const res = await axios.get(`${API_URL}/projects/${id}/files`);
+          const res = await axios.get(`${getApiUrl()}/projects/${id}/files`);
           return res.data.files;
         } catch (error) {
           console.error(`Error fetching project files:`, error);
@@ -48,7 +47,7 @@ const imagesService = {
         formData.append('files', file);
 
         try {
-            const res = await axios.post(`${API_URL}/projects/${id}/files`, formData);
+            const res = await axios.post(`${getApiUrl()}/projects/${id}/files`, formData);
             return res.data.files;
         } catch (error) {
             console.error(`Error adding file:`, error);
@@ -58,7 +57,7 @@ const imagesService = {
 
     removeFileFromProject: async (id: number, fileKey: number) => {
       try {
-        const res = await axios.delete(`${API_URL}/projects/${id}/files/${fileKey}`);
+        const res = await axios.delete(`${getApiUrl()}/projects/${id}/files/${fileKey}`);
         return res.data;
       } catch (error) {
         console.error(`Error fetching project files:`, error);
@@ -80,7 +79,7 @@ const imagesService = {
       const params: any = {};
       if (title !== '') params.query = title;
 
-      const res = await axios.get(`${API_URL}/photos/unsplash/search`, {
+      const res = await axios.get(`${getApiUrl()}/photos/unsplash/search`, {
         params,
       });
       return res.data.results;
@@ -89,7 +88,7 @@ const imagesService = {
     generateImage: async (prompt: string = '') => {
       const body = prompt ? { prompt } : {};
 
-      const res = await axios.post(`${API_URL}/photos/pollinations/generate`, body, {
+      const res = await axios.post(`${getApiUrl()}/photos/pollinations/generate`, body, {
         responseType: 'blob', 
       });
       return res.data;

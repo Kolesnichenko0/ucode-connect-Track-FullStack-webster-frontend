@@ -1,4 +1,3 @@
-import '../../styles/editor.css';
 import { useState, useEffect } from 'react';
 import ImagesPanel from '../../components/ImagesPanel';
 import ElementsPanel from '../../components/ElementsPanel';

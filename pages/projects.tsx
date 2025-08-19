@@ -1,4 +1,3 @@
-import '../styles/projects.css';
 import { Scrollbar } from 'react-scrollbars-custom';
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';

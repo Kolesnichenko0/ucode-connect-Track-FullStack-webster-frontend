@@ -1,4 +1,3 @@
-import '../styles/main.css';
 import { useAuth } from '../contexts/AuthContext';
 import { useRouter } from 'next/router';
 import { useTheme } from '../contexts/ThemeContext';

@@ -7,6 +7,7 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Camera, Trash2 } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
+import { getAssetsUrl } from '../utils/urls';
 
 type TabType = 'profile' | 'account';
 
@@ -32,7 +33,7 @@ const ProfileContent = ({ user }) => {
 
     const REQUIRED_CONFIRMATION_PHRASE = 'delete my account';
 
-    const DEFAULT_AVATAR_URL = 'http://localhost:8080/assets/images/user-avatars/default-avatar.png';
+    const DEFAULT_AVATAR_URL = `${getAssetsUrl()}/images/user-avatars/default-avatar.png`;
 
     useEffect(() => {
         if (user?.avatarFileURL && user.avatarFileURL !== DEFAULT_AVATAR_URL && !avatarPreview) {

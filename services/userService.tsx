@@ -1,6 +1,5 @@
 import axios from 'axios';
-
-const API_URL = 'http://localhost:8080/api/users';
+import {getUsersUrl} from "../utils/urls";
 
 const userService = {
   setAuthToken: (token: string) => {
@@ -12,23 +11,23 @@ const userService = {
   },
 
   getCurrentUser: async (userId: string) => {
-    const response = await axios.get(`${API_URL}/me`)
+    const response = await axios.get(`${getUsersUrl()}/me`)
     return response.data
 },
 updateCurrentUser: async (userData: any, userId: string) => {
-    const response = await axios.patch(`${API_URL}/${userId}`, userData)
+    const response = await axios.patch(`${getUsersUrl()}/${userId}`, userData)
     return response.data
 },
 updatePasswordUser: async (userData: any, userId: string) => {
-    const response = await axios.patch(`${API_URL}/${userId}/password`, userData)
+    const response = await axios.patch(`${getUsersUrl()}/${userId}/password`, userData)
     return response.data
 },
 getUserById: async (userId: string) => {
-    const response = await axios.get(`${API_URL}/${userId}`)
+    const response = await axios.get(`${getUsersUrl()}/${userId}`)
     return response.data
 },
 uploadAvatar: async (formData: FormData, userId: string) => {
-    const response = await axios.post(`${API_URL}/${userId}/upload-avatar`, formData, {
+    const response = await axios.post(`${getUsersUrl()}/${userId}/upload-avatar`, formData, {
         headers: {
             'Content-Type': 'multipart/form-data',
         },
@@ -48,7 +47,7 @@ fetchUserAvatar: async (avatarFileURL: string) => {
   },
   deleteUserAvatar: async (userId: string, fileKey: string) => {
     try {
-      const response = await axios.delete(`${API_URL}/${userId}/avatar/${fileKey}`);
+      const response = await axios.delete(`${getUsersUrl()}/${userId}/avatar/${fileKey}`);
       return response.data;
     } catch (error) {
       console.error('Error deleting avatar from API:', error);
@@ -57,7 +56,7 @@ fetchUserAvatar: async (avatarFileURL: string) => {
   },
   deleteUser: async (userId: string, data?: any) => {
     try {
-      const response = await axios.delete(`${API_URL}/${userId}`, { data });
+      const response = await axios.delete(`${getUsersUrl()}/${userId}`, { data });
       return response.data;
     } catch (error) {
       console.error('Error deleting user from API:', error);

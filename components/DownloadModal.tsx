@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/router';
-import '../styles/projects.css';
 
 type DownloadModalProps = {
   setIsOpenModal: (v: boolean) => void;

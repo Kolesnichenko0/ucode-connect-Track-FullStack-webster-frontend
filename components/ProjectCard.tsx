@@ -6,9 +6,9 @@ import { toast } from 'react-toastify';
 import toastStyles from './ui/toastStyles';
 import 'react-toastify/dist/ReactToastify.css';
 import { useTheme } from '../contexts/ThemeContext';
-import '../styles/main.css';
 import projectService from '../services/projectService';
 import axios from 'axios';
+import {getAssetsUrl} from "../utils/urls";
 
 const ProjectCard = ({ project, onProjectChanged }) => {
     const [loading, setLoading] = useState(true);
@@ -18,7 +18,7 @@ const ProjectCard = ({ project, onProjectChanged }) => {
     const [showActions, setShowActions] = useState(false);
     const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(null);
     const router = useRouter();
-    const DEFAULT_PREVIEW_URL = 'http://localhost:8080/assets/images/project/previews/default-project-preview.jpg';
+    const DEFAULT_PREVIEW_URL = `${getAssetsUrl()}/images/project/previews/default-project-preview.jpg`;
     
     useEffect(() => {
       if (project?.previewUrl && project.previewUrl !== DEFAULT_PREVIEW_URL) {

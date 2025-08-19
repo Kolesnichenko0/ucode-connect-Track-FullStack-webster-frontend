@@ -1,8 +1,6 @@
 import axios from 'axios';
 import userService from './userService';
-import { log } from 'console';
-
-const API_URL = 'http://localhost:8080/api/auth';
+import {getAuthUrl} from "../utils/urls";
 
 interface RegisterData {
   firstName: string;
@@ -38,7 +36,7 @@ interface AuthResponse {
 const authService = {
   register: async (userData: RegisterData) => {
     try {
-      const response = await axios.post(`${API_URL}/register`, userData);
+      const response = await axios.post(`${getAuthUrl()}/register`, userData);
       return response.data.user;
     } catch (error: any) {
       console.error('Registration API error:', error.response?.status, error.response?.data);
@@ -85,7 +83,7 @@ login: async (loginData: LoginData) => {
     }
     
     try {
-      const response = await axios.post<AuthResponse>(`${API_URL}/login`, loginData);
+      const response = await axios.post<AuthResponse>(`${getAuthUrl()}/login`, loginData);
       
       console.log('Server response from /api/auth/login:', response);
       console.log('Response data:', response.data);
@@ -128,7 +126,7 @@ login: async (loginData: LoginData) => {
     }
     
     try {
-      await axios.post(`${API_URL}/logout`, { refreshToken });
+      await axios.post(`${getAuthUrl()}/logout`, { refreshToken });
     } catch (error) {
       console.error('Logout error:', error);
       throw error;
@@ -146,7 +144,7 @@ login: async (loginData: LoginData) => {
       throw new Error('No refresh token available');
     }
     try {
-      const response = await axios.post<AuthResponse>(`${API_URL}/access-token/refresh`, { refreshToken });
+      const response = await axios.post<AuthResponse>(`${getAuthUrl()}/access-token/refresh`, { refreshToken });
       if (response.data.accessToken) {
         authService.setAuthToken(response.data.accessToken);
       }
@@ -158,17 +156,17 @@ login: async (loginData: LoginData) => {
   },
 
   verifyEmail: async (token: string) => {
-    const response = await axios.post(`${API_URL}/confirm-email/${token}`);
+    const response = await axios.post(`${getAuthUrl()}/confirm-email/${token}`);
     return response.data;
   },
 
   sendPasswordResetLink: async (email: string) => {
-    const response = await axios.post(`${API_URL}/reset-password`, { email });
+    const response = await axios.post(`${getAuthUrl()}/reset-password`, { email });
     return response.data;
   },
 
   resetPassword: async (token: string, newPassword: string) => {
-    const response = await axios.post(`${API_URL}/reset-password/${token}`, { newPassword });
+    const response = await axios.post(`${getAuthUrl()}/reset-password/${token}`, { newPassword });
     return response.data;
   },
 

@@ -1,6 +1,5 @@
 import axios from 'axios';
-
-const API_URL = 'http://localhost:8080/api/auth';
+import {getAuthUrl} from "../utils/urls";
 
 class CsrfService {
     private csrfToken: string | null = null;
@@ -8,7 +7,7 @@ class CsrfService {
     
     async fetchCsrfToken(): Promise<string | null> {
         try {
-            const response = await axios.get(`${API_URL}/csrf-token`, {
+            const response = await axios.get(`${getAuthUrl()}/csrf-token`, {
                 withCredentials: true
             });
             this.csrfToken = response.data.csrfToken;

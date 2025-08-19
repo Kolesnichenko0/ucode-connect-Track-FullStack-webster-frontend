@@ -4,6 +4,7 @@ import { useRouter } from 'next/router';
 import { useTheme } from '../contexts/ThemeContext';
 import Link from 'next/link';
 import Head from 'next/head';
+import { getAuthUrl } from '../utils/urls';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -211,7 +212,7 @@ export default function Login() {
                 </button>
                 <span className='w-full h-1 text-center flex items-center justify-center'>Or</span>
                 <button
-                  onClick={() => window.location.href = 'http://localhost:8080/api/auth/google'}
+                  onClick={() => window.location.href = `${getAuthUrl()}/google`}
                   style={{ backgroundColor: isDarkMode ? 'black' : 'white',
                         border: `1px solid ${isDarkMode ? 'white' : 'black'}`,
                   }}

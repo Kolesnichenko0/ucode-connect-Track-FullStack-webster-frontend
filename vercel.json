@@ -2,11 +2,11 @@
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "https://aurelia.onrender.com/api/$1"
+      "destination": "https://api-aurelia.onrender.com/api/$1"
     },
     {
       "source": "/assets/(.*)",
-      "destination": "https://aurelia.onrender.com/assets/$1"
+      "destination": "https://api-aurelia.onrender.com/assets/$1"
     },
     {
       "source": "/(.*)",
